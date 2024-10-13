@@ -2,6 +2,7 @@
 
 DOWNLOADS_HTML=~/Downloads/complete-index-html.html
 DOWNLOADS_CSS=~/Downloads/complete-styles-css.css
+DOWNLOADS_JS=~/Downloads/complete-script-js.js
 
 # Set timestamp
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -15,5 +16,10 @@ fi
 if [ -f styles.css ]; then
     cp styles.css styles.css.backup_$TIMESTAMP
     echo "Backed up styles.css to styles.css.backup_$TIMESTAMP"
+fi
+
+if [ -f script.js ]; then
+    cp script.js script.js.backup_$TIMESTAMP
+    echo "Backed up script.js to script.js.backup_$TIMESTAMP"
 fi
 

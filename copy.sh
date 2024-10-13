@@ -2,6 +2,7 @@
 
 DOWNLOADS_HTML = ~/Downloads/complete-index-html.html
 DOWNLOADS_CSS = ~/Downloads/complete-styles-css.css
+DOWNLOADS_JS = ~/Downloads/complete-script-js.js
 
 # Copy new files from Downloads
 if [ -f $DOWNLOADS_HTML ]; then
@@ -18,6 +19,13 @@ else
     echo "$DOWNLOADS_CSS not found, skipping copy"
 fi
 
+if [ -f $DOWNLOADS_JS ]; then
+    cp $DOWNLOADS_JS ./script.js
+    echo "Copied $DOWNLOADS_JS to current directory as script.js"
+else
+    echo "$DOWNLOADS_JS not found, skipping copy"
+fi
+
 # Remove downloaded files
 if [ -f $DOWNLOADS_HTML ]; then
     echo "Removing $DOWNLOADS_HTML..."
@@ -29,4 +37,9 @@ if [ -f $DOWNLOADS_CSS ]; then
     rm $DOWNLOADS_CSS
 fi
 
-echo "Copy, and removal completed."
+if [ -f $DOWNLOADS_JS ]; then
+    echo "Removing $DOWNLOADS_JS..."
+    rm $DOWNLOADS_JS
+fi
+
+echo "Copy files, and removal completed."
