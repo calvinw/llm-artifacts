@@ -6,12 +6,22 @@
     <title>OpenRouter API With Artifacts Window</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Add KaTeX CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <!-- Add KaTeX JS -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <!-- Add auto-render extension for KaTeX -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Add MathJax -->
+ 
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -32,10 +42,10 @@
                         <label class="settings-label">Render Mode:</label>
                         <div class="radio-group">
                             <label>
-                                <input type="radio" name="renderMode" value="text" checked> Text
+                                <input type="radio" name="renderMode" value="text"> Text
                             </label>
                             <label>
-                                <input type="radio" name="renderMode" value="markdown"> Markdown
+                                <input type="radio" name="renderMode" value="markdown" checked> Markdown
                             </label>
                         </div>
                     </div>
@@ -66,31 +76,6 @@
             <div class="panel-header">Content</div>
             <div class="panel-content">
                 <div class="content-item">
-                    <h3>Article Title</h3>
-                    <p>This is a sample article content. It can contain various HTML elements like paragraphs, lists, and more.</p>
-                </div>
-                <div class="content-item">
-                    <h3>Another Section</h3>
-                    <ul>
-                        <li>List item 1</li>
-                        <li>List item 2</li>
-                        <li>List item 3</li>
-                    </ul>
-                </div>
-                <p> 
-                Latex Tests
-                </p>
-                <div> 
-                    <p> Single Dollars </p>
-                    $x=4$
-                </div>
-                <div> 
-                    <p> Double Dollars </p>
-                    $$x=4$$
-                </div>
-                <div class="content-item">
-                    <h3>Final Thoughts</h3>
-                    <p>This panel can be used to display additional information, articles, or any other content relevant to the chat conversation.</p>
                 </div>
             </div>
         </div>
@@ -147,31 +132,27 @@
             const modelInput = document.getElementById('model');
             const settingsError = document.getElementById('settingsError');
             const renderModeRadios = document.querySelectorAll('input[name="renderMode"]');
+
             const clearChatButton = document.getElementById('clearChatButton');
             const systemPromptInput = document.getElementById('systemPrompt');
 
             let messageHistory = [];
 
             // Set default values
-            let apiKey = '';
-            let model = 'google/gemini-flash-1.5-8b';
-            let renderMode = 'markdown';
-            
-            // Initialize input fields with default values
-            if (apiKeyInput) {
-                apiKeyInput.value = apiKey;
-            }
-            if (modelInput) {
-                modelInput.value = model;
+            const defaultApiKey = '';
+            const defaultModel = 'openai/gpt-4o-mini';
+            //const defaultModel = 'google/gemini-flash-1.5-8b';
+
+            // Populate fields only if they're empty
+            if (!apiKeyInput.value) {
+                apiKeyInput.value = defaultApiKey;
             }
 
-            apiKeyInput?.addEventListener('input', function() {
-                apiKey = this.value.trim();
-            });
+            if (!modelInput.value) {
+                modelInput.value = defaultModel;
+            }
 
-            modelInput?.addEventListener('input', function() {
-                model = this.value.trim();
-            });
+            let renderMode = 'markdown';  // Set default render mode to markdown
 
             renderModeRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -199,7 +180,7 @@
             async function sendMessage() {
                 let userMessage = chatInput.value.trim();
                 if (userMessage) {
-                    if (!apiKey || !model) {
+                    if (!apiKeyInput.value.trim() || !modelInput.value.trim()) {
                         settingsError.textContent = 'Please enter API key and model in the settings panel.';
                         return;
                     }
@@ -228,11 +209,11 @@
                         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                             method: "POST",
                             headers: {
-                                "Authorization": `Bearer ${apiKey}`,
+                                "Authorization": `Bearer ${apiKeyInput.value.trim()}`,
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify({
-                                "model": model,
+                                "model": modelInput.value.trim(),
                                 "messages": currentMessageHistory,
                             })
                         });
@@ -279,9 +260,23 @@
 
                 messageHistory.push({
                     role: sender === 'user' ? 'user' : 'assistant',
-                    rawContent: message,
-                    renderedContent: renderedMessage
+                    rawContent: message
                 });
+
+                // Only typeset if in Markdown mode
+                if (renderMode === 'markdown') {
+                    MathJax.typesetPromise([textElement]).catch((err) => console.error(err.message));
+                }
+            }
+
+            function preprocessMessageForMath(message) {
+                // Escape \( and \) for inline math
+                message = message.replace(/\\\(/g, '\\\\(').replace(/\\\)/g, '\\\\)');
+
+                // Escape \\[ and \\] for display math
+                message = message.replace(/\\\[/g, '\\\\[').replace(/\\\]/g, '\\\\]');
+
+                return message;
             }
 
             function renderMessageText(message) {
@@ -294,28 +289,12 @@
                         gfm: true
                     };
 
-                    // Trim any trailing newlines before parsing
-                    let trimmedMessage = message.replace(/\n+$/, '');
-                    let renderedMessage = marked.parse(trimmedMessage, markedOptions);
-
-                    // Remove trailing <br> and unnecessary <p> tags
-                    renderedMessage = renderedMessage.replace(/<br\s*\/?>\s*$/, '').replace(/<\/p>\s*$/, '');
-
-                    // Render KaTeX in the message
-                    let tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = renderedMessage;
-                    renderMathInElement(tempDiv, {
-                        delimiters: [
-                            {left: "$$", right: "$$", display: true},
-                            {left: "$", right: "$", display: false},
-                            {left: "\(", right: "\)", display: false},
-                            {left: "\[", right: "\]", display: true},
-                            {left: "\\(", right: "\\)", display: false},
-                            {left: "\\[", right: "\\]", display: true}
-                        ],
-                        throwOnError: false
-                    });
-                    return tempDiv.innerHTML;
+                   // Step 1: Preprocess the LLM response to escape LaTeX delimiters
+                    const processedMessage = preprocessMessageForMath(message);
+                    
+                    // Step 2: Render the preprocessed message with Markdown
+                    let renderedMessage = marked.parse(processedMessage, markedOptions);
+                    return renderedMessage;
                 }
             }
 
@@ -353,8 +332,19 @@
                     messageElement.appendChild(messageContent);
 
                     chatContainer.appendChild(messageElement);
+
+                    // Only typeset if in Markdown mode
+                    if (renderMode === 'markdown') {
+                        MathJax.typesetPromise([textElement]).catch((err) => console.error(err.message));
+                    }
                 });
             }
+
+            window.addEventListener('load', function () {
+                MathJax.startup.promise.then(() => {
+                    MathJax.typesetPromise().catch((err) => console.error(err.message));
+                });
+            });
         });
     </script>
 </body>

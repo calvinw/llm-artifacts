@@ -123,7 +123,7 @@ body, html {
     padding: 8px 16px;
     line-height: 1.5;
     font-size: 14px;
-    margin-bottom: 0;
+    margin-bottom: 8px;
 }
 
 .chat-message:last-child {
@@ -153,9 +153,17 @@ body, html {
     flex-grow: 1;
 }
 
-/* Styles for rendered Markdown */
-.message-text p {
+/* Styles for rendered Markdown and MathJax */
+.message-text > *:first-child {
+    margin-top: 0;
+}
+
+.message-text > *:last-child {
     margin-bottom: 0;
+}
+
+.message-text p {
+    margin-bottom: 8px;
 }
 
 .message-text pre {
@@ -163,7 +171,7 @@ body, html {
     padding: 10px;
     border-radius: 4px;
     overflow-x: auto;
-    margin-bottom: 0;
+    margin-bottom: 8px;
 }
 
 .message-text code {
@@ -174,7 +182,7 @@ body, html {
 
 .message-text ul, .message-text ol {
     margin-left: 20px;
-    margin-bottom: 0;
+    margin-bottom: 8px;
 }
 
 .message-text img {
@@ -182,8 +190,15 @@ body, html {
     height: auto;
 }
 
-/* Add styles for KaTeX rendering */
-.katex { font-size: 1.1em; }
+/* Styles for MathJax-rendered equations */
+.MathJax {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.MathJax_Display {
+    margin: 0.5em 0;
+}
 
 /* Styles for settings form */
 .settings-form {
@@ -282,7 +297,6 @@ body, html {
 .system-prompt {
     width: 100%;
     min-height: 60px;
-    /*max-height: 120px;*/
     padding: 8px;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
