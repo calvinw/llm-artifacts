@@ -178,11 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function preprocessMessageForMath(message) {
-        message = message.replace(/\\\(/g, '\\\\(').replace(/\\\)/g, '\\\\)');
-        message = message.replace(/\\\[/g, '\\\\[').replace(/\\\]/g, '\\\\]');
-        return message;
-    }
+
+function preprocessMessageForMath(message) {
+    // Escape backslashes used for LaTeX parentheses, brackets, and dollar signs
+    message = message.replace(/\\\(/g, '\\\\(')
+                     .replace(/\\\)/g, '\\\\)')
+                     .replace(/\\\[/g, '\\\\[')
+                     .replace(/\\\]/g, '\\\\]')
+                     .replace(/\\\$/g, '\\\\$');
+
+
+    return message;
+}
 
     function renderMessageText(message) {
         if (renderMode === 'text') {
@@ -190,7 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             const markedOptions = { breaks: true, gfm: true };
             const processedMessage = preprocessMessageForMath(message);
+		//console.log("pre: " + processedMessage)
             let renderedMessage = marked.parse(processedMessage, markedOptions);
+		//console.log("post: " + renderedMessage)
             return renderedMessage;
         }
     }
