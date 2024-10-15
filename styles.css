@@ -1,307 +1,97 @@
-/* Reset and base styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
+:root {
+    --pico-font-size: 15px; /* Base font size */
 }
 
 body, html {
     height: 100%;
     overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    color: #374151;
+    user-select: none;
 }
 
-/* Layout and container styles */
-.container {
+#container {
     display: flex;
     height: 100%;
     width: 100%;
-    overflow: hidden;
 }
 
-.panel {
-    min-width: 50px;
-    background-color: #ffffff;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.panel-header {
-    background-color: #f3f4f6;
-    padding: 12px 16px;
-    font-weight: 600;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.panel-content {
-    flex-grow: 1;
+#panel1, #panel2, #panel3 {
     overflow-y: auto;
-    padding: 16px;
+    overflow-x: hidden;
+    user-select: text;
+}
+
+#panel1, #panel2, #panel3 {
+    background-color: white;
+    border-right: 1px solid #e0e0e0;
 }
 
 #panel1 {
-    width: 25%;
-    background-color: #f7f7f8;
-    border-right: 1px solid #e5e7eb;
+    flex-basis: 30%;
+    flex-grow: 1;
+    padding: 1rem;
 }
 
 #panel2 {
-    width: 50%;
+    flex-basis: 40%;
+    flex-grow: 1;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 #panel3 {
-    width: 25%;
-    background-color: #f7f7f8;
-    border-left: 1px solid #e5e7eb;
+    flex-basis: 30%;
+    flex-grow: 1;
+    padding: 1rem;
 }
 
-.divider {
-    width: 5px;
-    cursor: col-resize;
-    background-color: #e5e7eb;
-    transition: background-color 0.3s ease;
+#divider, #divider2 {
+    width: 10px;
+    background: #f0f0f0;
+    cursor: ew-resize;
 }
 
-.divider:hover {
-    background-color: #d1d5db;
-}
-
-/* Chat and input styles */
 .chat-container {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 8px 0;
 }
 
-.chat-input-container {
-    border-top: 1px solid #e5e7eb;
-    padding: 16px;
-}
-
-.chat-input-wrapper {
-    display: flex;
-    align-items: flex-start;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    padding: 8px 12px;
-}
-
-.chat-input {
-    flex-grow: 1;
-    border: none;
-    outline: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    resize: none;
-    overflow-y: auto;
-    min-height: 60px;
-    max-height: 150px;
-    line-height: 1.5;
-}
-
-.chat-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    color: #10a37f;
-    align-self: flex-end;
-    margin-left: 8px;
-}
-
-/* Chat message styles */
 .chat-message {
-    padding: 8px 16px;
-    line-height: 1.5;
-    font-size: 14px;
-    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
 
-.chat-message:last-child {
-    margin-bottom: 0;
+.chat-message:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.chat-message:nth-child(odd) {
+    background-color: #ffffff;
 }
 
 .user-message {
-    background-color: #f7f7f8;
+    border-left: 3px solid #007bff;
 }
 
 .bot-message {
-    background-color: #ffffff;
+    border-left: 3px solid #28a745;
 }
 
 .message-content {
     display: flex;
-    align-items: flex-start;
 }
 
 .message-icon {
-    font-weight: 600;
-    margin-right: 8px;
-    min-width: 50px;
+    font-weight: bold;
+    margin-right: 10px;
 }
 
 .message-text {
     flex-grow: 1;
 }
 
-/* Styles for rendered Markdown and MathJax */
-.message-text > *:first-child {
-    margin-top: 0;
-}
-
-.message-text > *:last-child {
-    margin-bottom: 0;
-}
-
 .message-text p {
-    margin-bottom: 8px;
-}
-
-.message-text pre {
-    background-color: #f4f4f4;
-    padding: 10px;
-    border-radius: 4px;
-    overflow-x: auto;
-    margin-bottom: 8px;
-}
-
-.message-text code {
-    background-color: #f4f4f4;
-    padding: 2px 4px;
-    border-radius: 4px;
-}
-
-.message-text ul, .message-text ol {
-    margin-left: 20px;
-    margin-bottom: 8px;
-}
-
-.message-text img {
-    max-width: 100%;
-    height: auto;
-}
-
-/* Styles for MathJax-rendered equations */
-.MathJax {
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
-.MathJax_Display {
-    margin: 0.5em 0;
-}
-
-/* Styles for settings form */
-.settings-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.settings-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.settings-label {
-    font-weight: 600;
-}
-
-.settings-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-}
-
-/* Content styles */
-.content-item {
-    margin-bottom: 16px;
-}
-
-.content-item h3 {
-    margin-bottom: 8px;
-}
-
-.content-item p {
-    line-height: 1.5;
-}
-
-/* Error message styles */
-.error-message {
-    color: #dc2626;
-    font-size: 14px;
-    margin-top: 8px;
-}
-
-/* Styles for radio buttons */
-.radio-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-top: 10px;
-}
-
-.radio-group label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-}
-
-.radio-group input[type="radio"] {
-    cursor: pointer;
-}
-
-/* Styles for Clear Chat Messages button */
-.clear-chat-button {
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.3s ease;
-}
-
-.clear-chat-button:hover {
-    background-color: #dc2626;
-}
-
-/* Styles for system prompt */
-.system-prompt-container {
-    padding: 16px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.system-prompt-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.system-prompt {
-    width: 100%;
-    min-height: 60px;
-    padding: 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    resize: vertical;
-    overflow-y: auto;
+    margin: 0;
 }

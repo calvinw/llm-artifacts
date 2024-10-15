@@ -1,45 +1,73 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let isDragging = false;
-    let startX, startWidth1, startWidth2, divider;
+        const divider = document.getElementById('divider');
+        const divider2 = document.getElementById('divider2');
+        const container = document.getElementById('container');
+        const panel1 = document.getElementById('panel1');
+        const panel2 = document.getElementById('panel2');
+        const panel3 = document.getElementById('panel3');
 
-    document.querySelectorAll('.divider').forEach(div => {
-        div.addEventListener('mousedown', function(e) {
-            isDragging = true;
-            divider = e.target;
+        let isResizing = false;
+        let startX = 0;
+        let startWidthPanel1 = 0;
+        let startWidthPanel2 = 0;
+        let startWidthPanel3 = 0;
+
+        divider.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent text selection while resizing
+            isResizing = 'panel1-panel2';
             startX = e.clientX;
-
-            const prevPanel = divider.previousElementSibling;
-            const nextPanel = divider.nextElementSibling;
-
-            startWidth1 = prevPanel.offsetWidth;
-            startWidth2 = nextPanel.offsetWidth;
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
+            startWidthPanel1 = panel1.offsetWidth;
+            startWidthPanel2 = panel2.offsetWidth;
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
         });
-    });
 
-    function onMouseMove(e) {
-        if (!isDragging) return;
+        divider2.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent text selection while resizing
+            isResizing = 'panel2-panel3';
+            startX = e.clientX;
+            startWidthPanel2 = panel2.offsetWidth;
+            startWidthPanel3 = panel3.offsetWidth;
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        });
 
-        const dx = e.clientX - startX;
-        const prevPanel = divider.previousElementSibling;
-        const nextPanel = divider.nextElementSibling;
+        function handleMouseMove(e) {
+            if (!isResizing) return;
 
-        const newWidth1 = startWidth1 + dx;
-        const newWidth2 = startWidth2 - dx;
+            const dx = e.clientX - startX;
+            const containerWidth = container.offsetWidth;
 
-        if (newWidth1 > 50 && newWidth2 > 50) {
-            prevPanel.style.width = `${newWidth1}px`;
-            nextPanel.style.width = `${newWidth2}px`;
+            if (isResizing === 'panel1-panel2') {
+                const newWidthPanel1 = startWidthPanel1 + dx;
+                const newWidthPanel2 = startWidthPanel2 - dx;
+
+                const panel1Percentage = (newWidthPanel1 / containerWidth) * 100;
+                const panel2Percentage = (newWidthPanel2 / containerWidth) * 100;
+
+                if (panel1Percentage > 10 && panel2Percentage > 10) {
+                    panel1.style.flexBasis = `${panel1Percentage}%`;
+                    panel2.style.flexBasis = `${panel2Percentage}%`;
+                }
+            } else if (isResizing === 'panel2-panel3') {
+                const newWidthPanel2 = startWidthPanel2 + dx;
+                const newWidthPanel3 = startWidthPanel3 - dx;
+
+                const panel2Percentage = (newWidthPanel2 / containerWidth) * 100;
+                const panel3Percentage = (newWidthPanel3 / containerWidth) * 100;
+
+                if (panel2Percentage > 10 && panel3Percentage > 10) {
+                    panel2.style.flexBasis = `${panel2Percentage}%`;
+                    panel3.style.flexBasis = `${panel3Percentage}%`;
+                }
+            }
         }
-    }
 
-    function onMouseUp() {
-        isDragging = false;
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-    }
+        function handleMouseUp() {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
 
     const chatContainer = document.getElementById('chatContainer');
     const chatInput = document.getElementById('chatInput');
@@ -153,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const iconElement = document.createElement('div');
         iconElement.classList.add('message-icon');
-        iconElement.textContent = sender === 'user' ? 'Human:' : 'AI:';
+        iconElement.textContent = sender === 'user' ? 'Me:' : 'AI:';
 
         const textElement = document.createElement('div');
         textElement.classList.add('message-text');
@@ -225,7 +253,7 @@ function preprocessMessageForMath(message) {
 
             const iconElement = document.createElement('div');
             iconElement.classList.add('message-icon');
-            iconElement.textContent = msg.role === 'user' ? 'Human:' : 'AI:';
+            iconElement.textContent = msg.role === 'user' ? 'Me:' : 'AI:';
 
             const textElement = document.createElement('div');
             textElement.classList.add('message-text');
