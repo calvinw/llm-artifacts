@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
-        const divider = document.getElementById('divider');
-        const divider2 = document.getElementById('divider2');
-        const container = document.getElementById('container');
-        const panel1 = document.getElementById('panel1');
-        const panel2 = document.getElementById('panel2');
-        const panel3 = document.getElementById('panel3');
+    const divider = document.getElementById('divider');
+    const divider2 = document.getElementById('divider2');
+    const container = document.getElementById('container');
+    const panel1 = document.getElementById('panel1');
+    const panel2 = document.getElementById('panel2');
+    const panel3 = document.getElementById('panel3');
 
-        let isResizing = false;
-        let startX = 0;
-        let startWidthPanel1 = 0;
-        let startWidthPanel2 = 0;
-        let startWidthPanel3 = 0;
+    let isResizing = false;
+    let startX = 0;
+    let startWidthPanel1 = 0;
+    let startWidthPanel2 = 0;
+    let startWidthPanel3 = 0;
 
         divider.addEventListener('mousedown', (e) => {
             e.preventDefault(); // Prevent text selection while resizing
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 let aiMessage = data.choices[0].message.content;
 
-                addMessage(aiMessage, 'bot');
+                addMessage(aiMessage, 'assistant');
             } catch (error) {
                 console.error('Error:', error);
                 settingsError.textContent = 'Error calling the API. Please check your settings and try again.';
@@ -171,10 +171,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function addMessage(message, sender) {
+    function createMessageElement(message, sender) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('chat-message');
-        messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        messageElement.classList.add('chat-message', `${sender}-message`);
 
         const messageContent = document.createElement('div');
         messageContent.classList.add('message-content');
@@ -193,6 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
         messageContent.appendChild(textElement);
         messageElement.appendChild(messageContent);
 
+        return { messageElement, textElement };
+    }
+
+    function addMessage(message, sender) {
+        const { messageElement, textElement } = createMessageElement(message, sender);
         chatContainer.appendChild(messageElement);
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -206,18 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
-function preprocessMessageForMath(message) {
-    // Escape backslashes used for LaTeX parentheses, brackets, and dollar signs
-    message = message.replace(/\\\(/g, '\\\\(')
-                     .replace(/\\\)/g, '\\\\)')
-                     .replace(/\\\[/g, '\\\\[')
-                     .replace(/\\\]/g, '\\\\]')
-                     .replace(/\\\$/g, '\\\\$');
-
-
-    return message;
-}
+    function preprocessMessageForMath(message) {
+        return message.replace(/\\\(/g, '\\\\(')
+                         .replace(/\\\)/g, '\\\\)')
+                         .replace(/\\\[/g, '\\\\[')
+                         .replace(/\\\]/g, '\\\\]')
+                         .replace(/\\\$/g, '\\\\$');
+    }
 
     function renderMessageText(message) {
         if (renderMode === 'text') {
@@ -225,9 +224,7 @@ function preprocessMessageForMath(message) {
         } else {
             const markedOptions = { breaks: true, gfm: true };
             const processedMessage = preprocessMessageForMath(message);
-		//console.log("pre: " + processedMessage)
             let renderedMessage = marked.parse(processedMessage, markedOptions);
-		//console.log("post: " + renderedMessage)
             return renderedMessage;
         }
     }
@@ -244,27 +241,7 @@ function preprocessMessageForMath(message) {
     function rerenderMessages() {
         chatContainer.innerHTML = '';
         messageHistory.forEach((msg) => {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message');
-            messageElement.classList.add(msg.role === 'user' ? 'user-message' : 'bot-message');
-
-            const messageContent = document.createElement('div');
-            messageContent.classList.add('message-content');
-
-            const iconElement = document.createElement('div');
-            iconElement.classList.add('message-icon');
-            iconElement.textContent = msg.role === 'user' ? 'Me:' : 'AI:';
-
-            const textElement = document.createElement('div');
-            textElement.classList.add('message-text');
-
-            const renderedMessage = renderMessageText(msg.rawContent);
-            textElement.innerHTML = renderedMessage;
-
-            messageContent.appendChild(iconElement);
-            messageContent.appendChild(textElement);
-            messageElement.appendChild(messageContent);
-
+            const { messageElement, textElement } = createMessageElement(msg.rawContent, msg.role);
             chatContainer.appendChild(messageElement);
 
             if (renderMode === 'markdown') {

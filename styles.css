@@ -64,18 +64,18 @@ body, html {
 }
 
 .chat-message:nth-child(even) {
-    background-color: #f8f8f8;
+    background-color: #ffffff;
 }
 
 .chat-message:nth-child(odd) {
-    background-color: #ffffff;
+    background-color: #f8f8f8;
 }
 
 .user-message {
     border-left: 3px solid #007bff;
 }
 
-.bot-message {
+.assistant-message {
     border-left: 3px solid #28a745;
 }
 
@@ -94,4 +94,13 @@ body, html {
 
 .message-text p {
     margin: 0;
+}
+
+.system-prompt-container {
+    height: 100%;
+}
+
+#systemPrompt {
+    height: 100%;
+    box-sizing: border-box;
 }
