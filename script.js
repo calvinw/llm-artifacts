@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const renderModeRadios = document.querySelectorAll('input[name="renderMode"]');
     const clearChatButton = document.getElementById('clearChatButton');
     const systemPromptInput = document.getElementById('systemPrompt');
+    const artifactContainer = document.getElementById('artifact-tab');
 
     let messageHistory = [];
     let renderMode = 'markdown';
@@ -90,6 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 let aiMessage = data.choices[0].message.content;
 
+		artifact = extractArtifactContent(aiMessage);
+		console.log(artifact)
+		artifactContainer.innerHTML = artifact;
                 addMessage(aiMessage, 'assistant');
 
             } catch (error) {
@@ -123,6 +127,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return { messageElement, textElement };
     }
+
+	function extractArtifactContent(text) {
+		  const regex = /<artifact>([\s\S]*?)<\/artifact>/;
+		  const match = text.match(regex);
+		  
+		  if (match && match[1]) {
+		      return match[1].trim();
+		  } else {
+		       return null;
+		  }
+	}
 
     function addMessage(message, sender) {
         const { messageElement, textElement } = createMessageElement(message, sender);
