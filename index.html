@@ -19,19 +19,21 @@
       }
     };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-    <!-- Add MathJax -->
+    <script id="MathJax-script" 
+	    async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
 </head>
 <body>
     <div id="container">
         <div id="panel1">
             <div class="panel-content">
-		    <form>
-		<label for="apiKey" class="settings-label">API Key:</label>
+		<label for="apiKey" class="settings-label">OpenRouter API Key:</label>
 		<input type="password" id="apiKey" class="settings-input" placeholder="Enter your API key">
-		<label for="model" class="settings-label">Model:</label>
-		<input type="text" id="model" class="settings-input" placeholder="Enter model name">
+		<label for="model" class="settings-label">OpenRouter Model:</label>
+                    <select id="model">
+                        <option value="">Select a model</option>
+                        <!-- Models will be populated dynamically -->
+                    </select>
 		<label class="settings-label">Render Mode:</label>
 		<div class="radio-group">
 		    <label>
@@ -43,7 +45,6 @@
 		</div>
 		<input id="clearChatButton" value="Clear Chat Messages" type="button">
                 <div id="settingsError" class="error-message"></div>
-		    </form>
             </div>
         </div>
         <div id="divider"></div>
@@ -51,8 +52,8 @@
             <div class="chat-container" id="chatContainer"></div>
             <div class="chat-input-container">
 		<fieldset role="group">
-		<textarea id="chatInput" class="chat-input" placeholder="Type your message here...">Why is Barbie so popular? 10 words</textarea>
-		<button id="chatButton" value="Send" />Send</button>
+			<textarea id="chatInput" class="chat-input" placeholder="Type your message here..."></textarea>
+			<button id="chatButton" value="Send" />Send</button>
 		</fieldset>
             </div>
         </div>
@@ -64,6 +65,9 @@
             </div>
         </div>
     </div>
+    <script src="fetch-models.js"></script>
+    <script src="resizing.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>

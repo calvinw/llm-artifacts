@@ -1,9 +1,5 @@
 #!/bin/bash
 
-DOWNLOADS_HTML=~/Downloads/complete-index-html.html
-DOWNLOADS_CSS=~/Downloads/complete-styles-css.css
-DOWNLOADS_JS=~/Downloads/complete-script-js.js
-
 # Set timestamp
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
