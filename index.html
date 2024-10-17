@@ -29,11 +29,13 @@
             <div class="panel-content">
 		<label for="apiKey" class="settings-label">OpenRouter API Key:</label>
 		<input type="password" id="apiKey" class="settings-input" placeholder="Enter your API key">
+                <div id="settingsError" class="error-message"></div>
 		<label for="model" class="settings-label">OpenRouter Model:</label>
                     <select id="model">
                         <option value="">Select a model</option>
                         <!-- Models will be populated dynamically -->
                     </select>
+		    <div id="modelInfo"></div>
 		<label class="settings-label">Render Mode:</label>
 		<div class="radio-group">
 		    <label>
@@ -44,7 +46,6 @@
 		    </label>
 		</div>
 		<input id="clearChatButton" value="Clear Chat Messages" type="button">
-                <div id="settingsError" class="error-message"></div>
             </div>
         </div>
         <div id="divider"></div>

@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let userMessage = chatInput.value.trim();
         if (userMessage) {
             if (!apiKeyInput.value.trim() || !modelSelect.value) {
-                settingsError.textContent = 'Please enter API key and select a model in the settings panel.';
+                settingsError.textContent = 'Please enter an OpenRouter API key.';
+		settingsError.classList.add('visible'); 
                 return;
             }
 
@@ -85,13 +86,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
+		settingsError.classList.remove('visible'); 
                 const data = await response.json();
                 let aiMessage = data.choices[0].message.content;
 
                 addMessage(aiMessage, 'assistant');
+
             } catch (error) {
                 console.error('Error:', error);
-                settingsError.textContent = 'Error calling the API. Please check your settings and try again.';
+	        settingsError.textContent = 'Error calling the API';
+		settingsError.classList.add('visible'); 
             }
         }
     }
