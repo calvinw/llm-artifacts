@@ -60,15 +60,26 @@
         </div>
         <div id="divider2"></div>
         <div id="panel3">
-            <div class="system-prompt-container">
-                <label for="systemPrompt" class="system-prompt-label">System Prompt:</label>
-                <textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here"></textarea>
-            </div>
+	  <div class="tabs">
+	    <span class="tab-label active" data-tab="system">System</span>
+	    <span class="tab-label" data-tab="artifact">Artifact</span>
+	  </div>
+	  
+	  <div class="tab-content active" id="system-tab">
+	    <div class="system-prompt-container">
+		<textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here"></textarea>
+	    </div>
+	  </div>
+	  
+	  <div class="tab-content" id="artifact-tab">
+		  artifact stuff
+	  </div>
         </div>
     </div>
     <script src="fetch-models.js"></script>
     <script src="resizing.js"></script>
     <script src="script.js"></script>
+    <script src="tabs.js"></script>
 
 </body>
 </html>
