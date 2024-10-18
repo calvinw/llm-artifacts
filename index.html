@@ -35,7 +35,6 @@
                         <option value="">Select a model</option>
                         <!-- Models will be populated dynamically -->
                     </select>
-		    <div id="modelInfo"></div>
 		<label class="settings-label">Render Mode:</label>
 		<div class="radio-group">
 		    <label>
@@ -46,6 +45,7 @@
 		    </label>
 		</div>
 		<input id="clearChatButton" value="Clear Chat Messages" type="button">
+		    <div id="modelInfo"></div>
             </div>
         </div>
         <div id="divider"></div>
@@ -61,12 +61,12 @@
         <div id="divider2"></div>
         <div id="panel3">
 	  <div class="tabs">
-	    <span class="tab-label active" data-tab="system">System</span>
+	    <span class="tab-label active" data-tab="system">System Prompt</span>
 	    <span class="tab-label" data-tab="artifact">Artifact</span>
+	    <span class="tab-label" data-tab="code">Code</span>
 	  </div>
 	  
 	  <div class="tab-content active" id="system-tab">
-	    <div class="system-prompt-container">
 		<textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here">
 Each time the user asks make an SVG for them and put it inside of tags called <artifact> </artifact>. You will have a conversation about this SVG and each time you will place the desired document with its changes inside of the <artifact> tag and put that at the end of your response.  Do not put the document you are working on inside of triple backticks, since you are putting it inside the <artifact> tags.
 
@@ -77,11 +77,13 @@ Example:
 	</svg>
 </artifact>
 		</textarea>
-	    </div>
 	  </div>
 	  
 	  <div class="tab-content" id="artifact-tab">
 		  Artifact Content will go here 
+	  </div>
+	  <div class="tab-content" id="code-tab">
+		<textarea id="codeArea" class="code-area">Code will Go here</textarea>
 	  </div>
         </div>
     </div>

@@ -9,12 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearChatButton = document.getElementById('clearChatButton');
     const systemPromptInput = document.getElementById('systemPrompt');
     const artifactContainer = document.getElementById('artifact-tab');
+    const codeTextArea = document.getElementById('codeArea');
 
+// Store the selection state
+//
     let messageHistory = [];
     let renderMode = 'markdown';
 
     // Set default values
     const defaultApiKey = '';
+
 
     if (!apiKeyInput.value) {
         apiKeyInput.value = defaultApiKey;
@@ -48,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (userMessage) {
             if (!apiKeyInput.value.trim() || !modelSelect.value) {
                 settingsError.textContent = 'Please enter an OpenRouter API key.';
-		settingsError.classList.add('visible'); 
+                settingsError.classList.add('visible'); 
                 return;
             }
 
@@ -87,19 +91,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-		settingsError.classList.remove('visible'); 
+                settingsError.classList.remove('visible'); 
                 const data = await response.json();
                 let aiMessage = data.choices[0].message.content;
 
-		artifact = extractArtifactContent(aiMessage);
-		console.log(artifact)
-		artifactContainer.innerHTML = artifact;
+                artifact = extractArtifactContent(aiMessage)
+                console.log(artifact)
+                artifactContainer.innerHTML = artifact
+		codeTextArea.value = artifact
                 addMessage(aiMessage, 'assistant');
 
             } catch (error) {
                 console.error('Error:', error);
-	        settingsError.textContent = 'Error calling the API';
-		settingsError.classList.add('visible'); 
+                settingsError.textContent = 'Error calling the API';
+                settingsError.classList.add('visible'); 
             }
         }
     }
@@ -128,21 +133,21 @@ document.addEventListener('DOMContentLoaded', function() {
         return { messageElement, textElement };
     }
 
-	function extractArtifactContent(text) {
-		  const regex = /<artifact>([\s\S]*?)<\/artifact>/;
-		  const match = text.match(regex);
-		  
-		  if (match && match[1]) {
-		      return match[1].trim();
-		  } else {
-		       return null;
-		  }
-	}
+    function extractArtifactContent(text) {
+        const regex = /<artifact>([\s\S]*?)<\/artifact>/;
+        const match = text.match(regex);
+        
+        if (match && match[1]) {
+            return match[1].trim();
+        } else {
+            return null;
+        }
+    }
 
     function addMessage(message, sender) {
         const { messageElement, textElement } = createMessageElement(message, sender);
         chatContainer.appendChild(messageElement);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        scrollToBottom();
 
         messageHistory.push({
             role: sender === 'user' ? 'user' : 'assistant',
@@ -154,6 +159,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function scrollToBottom() {
+        // Use requestAnimationFrame to ensure the DOM has updated before scrolling
+        requestAnimationFrame(() => {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+    }
+
     function preprocessMessageForMath(message) {
         return message.replace(/\\\(/g, '\\\\(')
                          .replace(/\\\)/g, '\\\\)')
@@ -162,12 +174,19 @@ document.addEventListener('DOMContentLoaded', function() {
                          .replace(/\\\$/g, '\\\\$');
     }
 
+	function removeArtifact(message) {
+	  const xmlRegex = /<artifact>[\s\S]*?<\/artifact>/g;
+	  return message.replace(xmlRegex, '');
+	}
+
     function renderMessageText(message) {
         if (renderMode === 'text') {
             return escapeHtml(message).replace(/\n/g, '<br>');
         } else {
             const markedOptions = { breaks: true, gfm: true };
-            const processedMessage = preprocessMessageForMath(message);
+	    const messageWithoutArtifact = removeArtifact(message)
+            const processedMessage = preprocessMessageForMath(messageWithoutArtifact);
+
             let renderedMessage = marked.parse(processedMessage, markedOptions);
             return renderedMessage;
         }
@@ -188,11 +207,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const { messageElement, textElement } = createMessageElement(msg.rawContent, msg.role);
             chatContainer.appendChild(messageElement);
         });
+        scrollToBottom();
 
         if (renderMode === 'markdown') {
-	    MathJax.typesetPromise([chatContainer]).catch((err) => console.error(err.message));
+            MathJax.typesetPromise([chatContainer]).catch((err) => console.error(err.message));
         }
     }
+
+    // Observe changes in the chat container
+    const resizeObserver = new ResizeObserver(() => {
+        scrollToBottom();
+    });
+    resizeObserver.observe(chatContainer);
 
     window.addEventListener('load', function () {
         MathJax.startup.promise.then(() => {

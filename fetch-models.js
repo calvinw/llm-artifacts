@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         modelInfoDiv.innerHTML = `
             <h3>${model.id}</h3>
-            <p><strong>Description:</strong> ${model.description || 'No description available.'}</p>
             <p><strong>Pricing:</strong> $${promptPrice.toFixed(4)}/$${completionPrice.toFixed(4)} per 1k tokens</p>
+            <p><strong>Description:</strong> ${model.description || 'No description available.'}</p>
         `;
     }
 
