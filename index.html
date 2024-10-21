@@ -5,92 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
     <link rel="stylesheet" href="styles.css">
     <script>
     MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true,
-        processEnvironments: true
-      },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-      }
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
     };
     </script>
     <script id="MathJax-script" 
-	    async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
+        async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
     <div id="container">
         <div id="panel1">
             <div class="panel-content">
-		<label for="apiKey" class="settings-label">OpenRouter API Key:</label>
-		<input type="password" id="apiKey" class="settings-input" placeholder="Enter your API key">
+                <label for="apiKey" class="settings-label">OpenRouter API Key:</label>
+                <input type="password" 
+                       id="apiKey" 
+                       class="settings-input" 
+                       placeholder="Enter your API key">
                 <div id="settingsError" class="error-message"></div>
-		<label for="model" class="settings-label">OpenRouter Model:</label>
-                    <select id="model">
-                        <option value="">Select a model</option>
-                        <!-- Models will be populated dynamically -->
-                    </select>
-		<label class="settings-label">Render Mode:</label>
-		<div class="radio-group">
-		    <label>
-			<input type="radio" name="renderMode" value="text"> Text
-		    </label>
-		    <label>
-			<input type="radio" name="renderMode" value="markdown" checked> Markdown
-		    </label>
-		</div>
-		<input id="clearChatButton" value="Clear Chat Messages" type="button">
-		    <div id="modelInfo"></div>
+                <label for="model" class="settings-label">OpenRouter Model:</label>
+                <select id="model">
+                    <option value=""></option>
+                </select>
+                <label class="settings-label">Render Mode:</label>
+                <div style="display:flex; gap: 1rem;" class="radio-group">
+                    <label>
+                        <input type="radio" name="renderMode" value="text"> Text
+                    </label>
+                    <label>
+                        <input type="radio" name="renderMode" value="markdown" checked> Markdown
+                    </label>
+                </div>
+                <input id="clearChatButton" value="Clear Chat Messages" type="button">
+                <div id="modelInfo"></div>
             </div>
         </div>
         <div id="divider"></div>
         <div id="panel2">
-            <div class="chat-container" id="chatContainer"></div>
+            <div class="chat-container" id="chatContainer">
+	    </div>
             <div class="chat-input-container">
-		<fieldset role="group">
-			<textarea id="chatInput" class="chat-input" placeholder="Type your message here..."></textarea>
-			<button id="chatButton" value="Send" />Send</button>
-		</fieldset>
+                <fieldset role="group">
+                    <textarea id="chatInput" class="chat-input" placeholder="Can you give me the artifact to work on..."></textarea>
+                    <button id="chatButton" value="Send">Send</button>
+                </fieldset>
             </div>
         </div>
         <div id="divider2"></div>
         <div id="panel3">
-	  <div class="tabs">
-	    <span class="tab-label active" data-tab="system">System Prompt</span>
-	    <span class="tab-label" data-tab="artifact">Artifact</span>
-	    <span class="tab-label" data-tab="code">Code</span>
-	  </div>
-	  
-	  <div class="tab-content active" id="system-tab">
-		<textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here">
-Each time the user asks make an SVG for them and put it inside of tags called <artifact> </artifact>. You will have a conversation about this SVG and each time you will place the desired document with its changes inside of the <artifact> tag and put that at the end of your response.  Do not put the document you are working on inside of triple backticks, since you are putting it inside the <artifact> tags.
+            <div class="tabs">
+                <span class="tab-label" data-tab="artifact">Preview</span>
+                <span class="tab-label" data-tab="code">Code<span id="codeChangeIndicator" style="display:none;color:red;">*</span></span>
+                <span class="tab-label active" data-tab="system">System Prompt</span>
+		<!--<span class="tab-label" data-tab="debug">Debug</span>-->
+            </div>
+            
+            
+            <div class="tab-content" id="artifact-tab">
+                Artifact Content will go here 
+            </div>
+<div class="tab-content" id="code-tab">
+	<!--<textarea id="codeArea" class="code-area">Code will Go here</textarea>-->
+	        <div id="codeArea"></div>
+            <!--<button id="saveCodeButton" value="Save">Save</button>-->
+</div>
+	    <!--<div class="tab-content" id="debug-tab"></div>-->
+            <div class="tab-content active" id="system-tab">
+                <textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here">You are a friendly assistant editing a document with a user.
+
+You and the user will work on an document about their summer vacation together. The document will be markdown and the content of the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
+
+When you make changes to the document you will tell the user what was changed and then include the artifact document at the end of your response. Before you send the artifact document to the user you will update the version number. If the user sends you the artifact with a new version number then you respond you see the changes and ask if the user wants you to make further changes.
 
 Example:
-<artifact>
-	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-	  <circle cx="50" cy="50" r="40" fill="red" stroke="black" stroke-width="2" />
-	</svg>
+<artifact identifier="my-summer-vacation" title="My Summer Vacation" type="text/markdown" version="1">
+# My Summer Vacation
+
+## The Start
+In the first part of the summer I went to the beach. I had a great time and played outside all day long. It was *really* very fun.
+
+## The Middle
+Then I went to the **mountains** 
+
+## The End
+I came back home 
+
 </artifact>
-		</textarea>
-	  </div>
-	  
-	  <div class="tab-content" id="artifact-tab">
-		  Artifact Content will go here 
-	  </div>
-	  <div class="tab-content" id="code-tab">
-		<textarea id="codeArea" class="code-area">Code will Go here</textarea>
-	  </div>
+</textarea>
+            </div>
+                <label class="settings-label">Arfifact Editable By</label>
+                <div style="display:flex; gap: 1rem;" class="radio-group">
+                    <label>
+                    <input type="radio" name="editMode" value="llm only">
+		    LLM Only 
+                    </label>
+                    <label>
+	            <input type="radio" name="editMode" value="llm and user" checked>
+		    LLM and User 
+                    </label>
+                </div>
         </div>
     </div>
+    <script src="debug.js"></script>
     <script src="fetch-models.js"></script>
     <script src="resizing.js"></script>
     <script src="script.js"></script>
-    <script src="tabs.js"></script>
-
 </body>
 </html>

@@ -5,7 +5,6 @@
 body, html {
     height: 100%;
     overflow: hidden;
-    user-select: none;
 }
 
 #container {
@@ -17,7 +16,7 @@ body, html {
 #panel1, #panel2, #panel3 {
     overflow-y: auto;
     overflow-x: hidden;
-    user-select: text;
+    /*user-select: text;*/
 }
 
 #panel1, #panel2, #panel3 {
@@ -43,7 +42,8 @@ body, html {
     flex-basis: 40%;
     flex-grow: 1;
     padding: 1rem;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #divider, #divider2 {
@@ -59,7 +59,7 @@ body, html {
 }
 
 .chat-input-container {
-    position: sticky;
+    /*position: sticky;*/
     bottom: 0;
     background-color: white;
     padding-top: 10px;
@@ -106,12 +106,12 @@ body, html {
 }
 
 .system-prompt {
-    height: 100%;
+    height: 95%;
     box-sizing: border-box;
 }
 
 .code-area {
-    height: 100%;
+    height: 90%;
     box-sizing: border-box;
 }
 
@@ -153,4 +153,12 @@ body, html {
 
 .tab-content.active {
     display: block;
+}
+
+#codeArea {
+    width: 100%;  /* Set the initial width */
+    height: 95%; /* Set the initial height */
+    border: 2px solid #ccc; /* Optional: add a border to make it more visually distinct */
+    resize: both; /* Allow resizing both horizontally and vertically */
+    overflow: hidden; /* Prevent overflowing when resizing */
 }

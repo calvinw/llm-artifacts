@@ -1,79 +1,88 @@
-# Artifact Simulation System
+Here's a comprehensive test string containing various types of artifacts with different attribute combinations:
 
-As an AI assistant, you will now simulate an artifact system. When creating substantial, self-contained content that the user might want to modify or reuse, format your response as follows:
+<artifact identifier="sample-html" type="text/html" title="Sample HTML Document" version="1.2.3">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample HTML</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a sample HTML document with all attributes.</p>
+</body>
+</html>
+</artifact>
 
----
-[ARTIFACT: Unique_Identifier]
-Title: Brief title or description
-Type: [Code | Markdown Document | HTML | SVG] 
-Version: 1
-Content:
-[Insert the full content here]
----
+<artifact identifier="sample-markdown" type="text/markdown" version="0.9.0">
+# Markdown Example
 
-After creating an artifact, refer to it by its identifier when needed. If asked to modify an existing artifact, create a new version with the same identifier, incrementing the version number, and showing the full updated content.
+This is a simple Markdown document without a title attribute.
 
-Rules for creating artifacts:
-1. Use for substantial content (>15 lines)
-2. Content should be self-contained and understandable on its own
-3. Ideal for content likely to be modified or reused
-4. Not for simple informational or short content
-5. One artifact per response unless specifically requested otherwise
-6. Always include a version number, starting at 1 for new artifacts and incrementing for updates
+- Item 1
+- Item 2
+- Item 3
 
-Remember to always show the full, updated content when modifying an artifact, increment the version number, and maintain consistent formatting and identifiers.
+**Bold text** and *italic text*.
+</artifact>
 
-Example usage:
-User: "Create a Python function to calculate Fibonacci numbers."
-Assistant: Certainly! Here's a Python function to calculate Fibonacci numbers:
+<artifact identifier="sample-svg" type="image/svg+xml" title="Sample SVG">
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
+</svg>
+</artifact>
 
----
-[ARTIFACT: fibonacci_function]
-Title: Fibonacci Number Calculator
-Type: Code
-Version: 1
-Content:
+<artifact identifier="sample-python" type="application/x-python" title="Sample Python Function" version="2.1.0">
 def fibonacci(n):
-    if n <= 0:
-        return "Please enter a positive integer"
-    elif n == 1 or n == 2:
-        return 1
+    if n <= 1:
+        return n
     else:
-        fib = [1, 1]
-        for i in range(2, n):
-            fib.append(fib[i-1] + fib[i-2])
-        return fib[-1]
+        return fibonacci(n-1) + fibonacci(n-2)
 
-# Example usage
-print(fibonacci(10))  # Output: 55
----
+print(fibonacci(10))
+</artifact>
 
-This artifact creates a function `fibonacci(n)` that calculates the nth Fibonacci number. You can use this function by calling it with a positive integer as the argument.
+<artifact identifier="sample-javascript" type="application/javascript">
+function greet(name) {
+    return `Hello, ${name}!`;
+}
 
-User: "Can you modify the Fibonacci function to return the entire sequence instead of just the last number?"
-Assistant: Certainly! I'll modify the Fibonacci function to return the entire sequence:
+console.log(greet('World'));
+</artifact>
 
----
-[ARTIFACT: fibonacci_function]
-Title: Fibonacci Sequence Generator
-Type: Code
-Version: 2
-Content:
-def fibonacci(n):
-    if n <= 0:
-        return "Please enter a positive integer"
-    elif n == 1:
-        return [1]
-    elif n == 2:
-        return [1, 1]
-    else:
-        fib = [1, 1]
-        for i in range(2, n):
-            fib.append(fib[i-1] + fib[i-2])
-        return fib
+<artifact identifier="sample-css" type="text/css" title="Sample CSS" version="1.0.1">
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
 
-# Example usage
-print(fibonacci(10))  # Output: [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
----
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+</artifact>
 
-I've updated the `fibonacci_function` artifact to version 2. Now, instead of returning only the last number, it returns the entire Fibonacci sequence up to the nth number. The function now returns a list containing all the Fibonacci numbers up to the specified position.
+<artifact identifier="sample-json" type="application/json" version="3.2.1">
+{
+  "name": "John Doe",
+  "age": 30,
+  "city": "New York",
+  "hobbies": ["reading", "swimming", "coding"]
+}
+</artifact>
+
+<artifact identifier="sample-csv" type="text/csv" title="Sample CSV">
+Name,Age,City
+John Doe,30,New York
+Jane Smith,25,San Francisco
+Bob Johnson,35,Chicago
+</artifact>
+
+<artifact identifier="sample-plain-text" type="text/plain" title="Sample Plain Text" version="1.1.0">
+This is a sample of plain text.
+It can contain multiple lines.
+No special formatting is applied.
+</artifact>
+
+That's all the artifact types with various attribute combinations!
