@@ -28,7 +28,7 @@ Here is an example of how this works
 
 **AI**:  Your current order looks like this
 ```
-<artifact version="1">
+<artifact version="2">
 | Item          | Quantity | Price  |
 |---------------|----------|--------|
 | Margherita    | 1        | $15.00 |
@@ -42,7 +42,7 @@ Here is an example of how this works
 
 **AI**:  Your current order looks like this
 ```
-<artifact version="1">
+<artifact version="3">
 | Item          | Quantity | Price  |
 |---------------|----------|--------|
 | Margherita    | 1        | $15.00 |
@@ -55,7 +55,7 @@ Here is an example of how this works
 
 **AI**:  Just confirming here is your current order, would you like to eat in or pick up?
 ```
-<artifact version="1">
+<artifact version="3">
 | Item          | Quantity | Price  |
 |---------------|----------|--------|
 | Margherita    | 1        | $15.00 |
