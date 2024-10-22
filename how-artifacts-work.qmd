@@ -1,0 +1,83 @@
+# Artifacts
+
+
+## One Way Artifacts
+
+### The User and the AI Work Together But Document is Update by AI 
+
+The user and the AI converse in a chat but only the AI sends artifacts
+to the user
+
+Here is an example of how this works
+
+**User**: I want 2 Maragherita Pizzas, one Pepperoni and 1 Vegetarian
+ 
+**AI**:  Your current order looks like this
+```
+<artifact version="1">
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 2        | $30.00 |
+| Pepperoni     | 1        | $17.00 |
+| Vegetarian    | 1        | $16.00 |
+| Total         |          | $78.00 |
+</artifact>
+```
+
+**User**: Actually I just want 1 Maragherita Pizzas, 1 Pepperoni and 1 Vegetarian
+
+**AI**:  Your current order looks like this
+```
+<artifact version="1">
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 1        | $15.00 |
+| Pepperoni     | 1        | $17.00 |
+| Vegetarian    | 1        | $16.00 |
+| Total         |          | $63.00 |
+</artifact>
+```
+
+**User**: Actually I dont have enough money for a Vegetarian, can you remove it. 
+
+**AI**:  Your current order looks like this
+```
+<artifact version="1">
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 1        | $15.00 |
+| Pepperoni     | 1        | $17.00 |
+| Total         |          | $32.00 |
+</artifact>
+```
+
+**User**: Okay then that looks fine. 
+
+**AI**:  Just confirming here is your current order, would you like to eat in or pick up?
+```
+<artifact version="1">
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 1        | $15.00 |
+| Pepperoni     | 1        | $17.00 |
+| Total         |          | $32.00 |
+</artifact>
+```
+
+At each stage the Users UI removes the artifact from the response 
+sent by the user and displays it in a Preview window.
+
+So that the customer sees current order displayed in a Preview window:
+
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 2        | $30.00 |
+| Pepperoni     | 1        | $17.00 |
+| Vegetarian    | 1        | $16.00 |
+| Total         |          | $78.00 |
+
+They never see the details of the artifact document being passed
+but it is done under the hood. The effect is that the LLM 
+is editing the document displayed in the users window.
+
+

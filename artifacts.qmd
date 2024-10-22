@@ -1,0 +1,238 @@
+# Artifacts
+
+### The User and LLM Work On a Document Together
+
+The idea of artifacts is that it is a method for an LLM and a User to work on a document together through a chat and document display user interface. 
+
+### The Environment Can Display the Artifacts
+
+The environment has a way to "display" the artifacts that the LLM sends and may also have various ways for the User to edit the artifacts as well.
+
+### The Artifacts Are Described in System Prompting
+
+Through system prompting for the LLM, they are told that they will be sending some documents to the user based on instructions they receive and the format that is described. The artifact is described to the bot, and they are given instructions on what to do to edit it.
+
+The documents will be enclosed in <ARTIFACT></ARTIFACT> tags and embedded with the text response that the LLM sends to the User.
+
+### The Artifacts Are Embedded Into the Chat Conversation Messages Sent
+
+The documents are sent to the user after each edit by the LLM. In the messages from the LLM, the LLM describes the edits they have made to the artifact. Each time the LLM sends a new version of the document.
+
+## Standard Artifact Types
+
+### Plain Text
+
+Here is a plain text artifact
+
+```xml
+<artifact identifier="sample-plain-text" 
+          type="text/plain" 
+          title="Plain Text Example" 
+          version="1">
+This is a sample of plain text.
+It can contain multiple lines.
+No special formatting is applied.
+</artifact>
+```
+
+### Markdown
+
+Here is a markdown artifact
+
+```xml
+<artifact identifier="sample-markdown" 
+          type="text/markdown" 
+          title="Markdown Example Document" 
+          version="1">
+# Markdown Example
+This is a simple Markdown document without a title attribute.
+- Item 1
+- Item 2
+- Item 3
+**Bold text** and *italic text*.
+</artifact>
+```
+
+### HTML
+
+Here is an HTML artifact
+
+```xml
+<artifact identifier="sample-html" 
+          type="text/html" 
+          title="Sample HTML Document" 
+          version="1">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample HTML</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a sample HTML document with all attributes.</p>
+</body>
+</html>
+</artifact>
+```
+
+### SVG
+
+Here is an SVG artifact
+
+```xml
+<artifact identifier="sample-svg" 
+          type="image/svg+xml" 
+          title="Sample SVG Circle" 
+          version="1">
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
+</svg>
+</artifact>
+```
+
+### Python
+
+Here is a python artifact
+
+```xml
+<artifact identifier="sample-python" 
+          type="application/vnd.ant.code" 
+          language="python" 
+          title="Fibonacci Function" 
+          version="1">
+def fibonacci(n):
+    if n <= 1:
+        return n
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
+print(fibonacci(10))
+</artifact>
+```
+
+### JavaScript
+
+Here is a javascript artifact
+
+```xml
+<artifact identifier="sample-javascript" 
+          type="application/vnd.ant.code" 
+          language="javascript" 
+          title="Greeting Function" 
+          version="1">
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+console.log(greet('World'));
+</artifact>
+```
+
+### CSS
+
+Here is a css artifact
+
+```xml
+<artifact identifier="sample-css" 
+          type="application/vnd.ant.code" 
+          language="css" 
+          title="Basic Page Styling" 
+          version="1">
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+</artifact>
+```
+
+### JSON
+
+Here is a json artifact
+
+```xml
+<artifact identifier="sample-json" 
+          type="application/json" 
+          title="User Data Example" 
+          version="1">
+{
+  "name": "John Doe",
+  "age": 30,
+  "city": "New York",
+  "hobbies": ["reading", "swimming", "coding"]
+}
+</artifact>
+```
+
+### CSV
+
+Here is a csv artifact
+
+```xml
+<artifact identifier="sample-csv" 
+          type="text/csv" 
+          title="User Database Sample" 
+          version="1">
+Name,Age,City
+John Doe,30,New York
+Jane Smith,25,San Francisco
+Bob Johnson,35,Chicago
+</artifact>
+```
+
+## Custom Artifact Types
+
+You can also create customized artifact types. For example, you can create a markdown table editor that would have just a table that you are creating.
+
+### Markdown Table Editor
+
+Here is an example of a specialized markdown table artifact. It always has the structure of a markdown table that the user is editing.
+
+```xml
+<artifact identifier="sample-markdown-table" 
+          type="text/markdown" 
+          title="Markdown Table Example" 
+          version="1">
+| Name       | Age | City          |
+|------------|-----|---------------|
+| John Doe   | 30  | New York      |
+| Jane Smith | 25  | San Francisco |
+| Bob Johnson| 35  | Chicago       |
+</artifact>
+```
+
+### Customer Order Table 
+
+Here is an example of another specialized artifact. This one describes the customer's current order during the interaction with a pizza order bot.
+
+```xml
+<artifact identifier="sample-customer-order" 
+          type="text/markdown" 
+          title="Customer Order Table Example" 
+          version="1">
+| Item          | Quantity | Price  |
+|---------------|----------|--------|
+| Margherita    | 2        | $15.00 |
+| Pepperoni     | 1        | $17.00 |
+| Vegetarian    | 1        | $16.00 |
+| Total         |          | $63.00 |
+</artifact>
+```
+
+### Example Math Problem Artifact
+
+This one just describes the statement of a math problem. Like in statistics for finding the left tail area. Here the artifact is just plain text and is meant to display a problem to the user for them to interact with.
+
+```xml
+<artifact identifier="sample-math-problem" 
+          type="text/plain" 
+          title="Example Math Problem" 
+          version="1">
+Find the left tail area under the standard normal distribution curve to the left of $z = -1.96$.
+</artifact>
+```
+
+This custom artifacts can be literally anything.

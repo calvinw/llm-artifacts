@@ -1,6 +1,51 @@
-Here's a comprehensive test string containing various types of artifacts with different attribute combinations:
+# Artifacts
 
-<artifact identifier="sample-html" type="text/html" title="Sample HTML Document" version="1.2.3">
+## The User and LLM Work On a Document Together
+
+The idea of artifacts is that it is a method for an LLM and a User to work on a document together through a chat and document display user interface. 
+
+## The Environment Can Display the Artifacts
+
+The environment has a way to “display” the artifacts that the LLM sends and may also have various ways for the User to edit the artifacts as well.
+
+## The Artifacts Are Described in System Prompting
+
+Through system prompting for the LLM they are told that they will be sending some documents to the user based on instructions they receive and the format that is described. The artifact is described to the bot and they are given instructions on what to do to edit it 
+
+The documents will be enclosed in <artifact></artifact> tags and embedded with the text response that the LLM sends to the User. 
+
+## The Artifacts Are Embedded Into the Chat Conversation Messages Sent
+
+The documents are sent to the user after each edit by the LLM. In the  messages from the LLM, the LLM describes the edits they have made to the artifact. Each time the LLM sends a new version of the document 
+
+Here is a plain text artifact
+
+```xml
+<artifact identifier="sample-plain-text" type="text/plain" title="Plain Text Example" version="1">
+This is a sample of plain text.
+It can contain multiple lines.
+No special formatting is applied.
+</artifact>
+```
+
+Here is a markdown artifact
+
+```xml
+<artifact identifier="sample-markdown" type="text/markdown" title="Markdown Example Document" version="1">
+# Markdown Example
+This is a simple Markdown document without a title attribute.
+- Item 1
+- Item 2
+- Item 3
+**Bold text** and *italic text*.
+</artifact>
+```
+
+Here is an HTML artifact
+
+
+```xml
+<artifact identifier="sample-html" type="text/html" title="Sample HTML Document" version="1">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,57 +58,60 @@ Here's a comprehensive test string containing various types of artifacts with di
 </body>
 </html>
 </artifact>
+```
 
-<artifact identifier="sample-markdown" type="text/markdown" version="0.9.0">
-# Markdown Example
+Here is an SVG artifact
 
-This is a simple Markdown document without a title attribute.
-
-- Item 1
-- Item 2
-- Item 3
-
-**Bold text** and *italic text*.
-</artifact>
-
-<artifact identifier="sample-svg" type="image/svg+xml" title="Sample SVG">
+```xml
+<artifact identifier="sample-svg" type="image/svg+xml" title="Sample SVG Circle" version="1">
 <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
   <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
 </svg>
 </artifact>
+```
 
-<artifact identifier="sample-python" type="application/x-python" title="Sample Python Function" version="2.1.0">
+Here is a python artifact
+
+```xml
+<artifact identifier="sample-python" type="application/vnd.ant.code" language="python" title="Fibonacci Function" version="1">
 def fibonacci(n):
     if n <= 1:
         return n
     else:
         return fibonacci(n-1) + fibonacci(n-2)
-
 print(fibonacci(10))
 </artifact>
+```
 
-<artifact identifier="sample-javascript" type="application/javascript">
+Here is a javascript artifact
+
+```xml
+<artifact identifier="sample-javascript" type="application/vnd.ant.code" language="javascript" title="Greeting Function" version="1">
 function greet(name) {
     return `Hello, ${name}!`;
 }
-
 console.log(greet('World'));
 </artifact>
+```
+Here is a css artifact
 
-<artifact identifier="sample-css" type="text/css" title="Sample CSS" version="1.0.1">
+```xml
+<artifact identifier="sample-css" type="application/vnd.ant.code" language="css" title="Basic Page Styling" version="1">
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
 }
-
 .container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
 </artifact>
+```
 
-<artifact identifier="sample-json" type="application/json" version="3.2.1">
+
+```xml
+<artifact identifier="sample-json" type="application/json" title="User Data Example" version="1">
 {
   "name": "John Doe",
   "age": 30,
@@ -71,18 +119,14 @@ body {
   "hobbies": ["reading", "swimming", "coding"]
 }
 </artifact>
+```
 
-<artifact identifier="sample-csv" type="text/csv" title="Sample CSV">
+```xml
+<artifact identifier="sample-csv" type="text/csv" title="User Database Sample" version="1">
 Name,Age,City
 John Doe,30,New York
 Jane Smith,25,San Francisco
 Bob Johnson,35,Chicago
 </artifact>
+```
 
-<artifact identifier="sample-plain-text" type="text/plain" title="Sample Plain Text" version="1.1.0">
-This is a sample of plain text.
-It can contain multiple lines.
-No special formatting is applied.
-</artifact>
-
-That's all the artifact types with various attribute combinations!

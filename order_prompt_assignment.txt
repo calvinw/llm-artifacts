@@ -1,0 +1,57 @@
+<<<
+Put something here that describes what you want the order bot to do with the
+menu and the example artifact below. Make sure you describe what order the
+order items should appear on the current order. For example, maybe you want
+pizzas at the top and sides and drinks at the bottom.  You should tell the bot
+that it will be sending one artifact like the one below with each response and
+it must be enclosed in <artifact> tags.
+
+If you want a different format for your current order, then change the artifact. 
+
+Tell the bot to display the menu in the normal chat history, but you could do a
+version where you move the whole menu into the artifact so that it displays the
+menu and the current order status in the artifact preview window. But the basic
+version would have the bot display the menu in the chat history. 
+>>> 
+
+<menu>
+## Pizzas
+
+- pepperoni pizza \$12.95, \$10.00, \$7.00
+- cheese pizza \$10.95, \$9.25, \$6.50
+- eggplant pizza \$11.95, \$9.75, \$6.75
+
+## Sides
+
+- fries \$4.50, \$3.50
+- greek salad \$7.25
+
+## Toppings
+
+- extra cheese \$2.00,
+- mushrooms \$1.50
+- sausage \$3.00
+- canadian bacon \$3.50
+- peppers \$1.00
+
+## Drinks
+
+- coke \$3.00, \$2.00, \$1.00
+- sprite \$3.00, \$2.00, \$1.00
+- bottled water \$5.00
+
+</menu>
+
+
+Example:
+<artifact title="Your Current Order" identifier="current order" type="text/markdown" version="1">
+# Your Current Order
+
+| Item | Size | Quantity | Price |
+|------|------|----------|-------|
+| Cheese Pizza | Medium | 1 | $9.25 |
+| Greek Salad | - | 2 | $14.50 |
+| Fries | Large | 1 | $4.50 |
+| Sprite | Small | 1 | $1.00 |
+| **Total** | | | **$29.25** |
+</artifact>
