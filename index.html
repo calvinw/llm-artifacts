@@ -20,8 +20,7 @@
         }
     };
     </script>
-    <script id="MathJax-script" 
-        async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
     <div id="container">
@@ -50,10 +49,11 @@
                 <div id="modelInfo"></div>
             </div>
         </div>
+        
         <div id="divider"></div>
+        
         <div id="panel2">
-            <div class="chat-container" id="chatContainer">
-	    </div>
+            <div class="chat-container" id="chatContainer"></div>
             <div class="chat-input-container">
                 <fieldset role="group">
                     <textarea id="chatInput" class="chat-input" placeholder="Can you give me the artifact to work on..."></textarea>
@@ -61,25 +61,24 @@
                 </fieldset>
             </div>
         </div>
+        
         <div id="divider2"></div>
+        
         <div id="panel3">
             <div class="tabs">
                 <span class="tab-label" data-tab="artifact">Preview</span>
                 <span class="tab-label" data-tab="code">Code<span id="codeChangeIndicator" style="display:none;color:red;">*</span></span>
                 <span class="tab-label active" data-tab="system">System Prompt</span>
-		<!--<span class="tab-label" data-tab="debug">Debug</span>-->
             </div>
-            
             
             <div class="tab-content" id="artifact-tab">
                 Artifact Content will go here 
             </div>
-<div class="tab-content" id="code-tab">
-	<!--<textarea id="codeArea" class="code-area">Code will Go here</textarea>-->
-	        <div id="codeArea"></div>
-            <!--<button id="saveCodeButton" value="Save">Save</button>-->
-</div>
-	    <!--<div class="tab-content" id="debug-tab"></div>-->
+            
+            <div class="tab-content" id="code-tab">
+                <div id="codeArea"></div>
+            </div>
+            
             <div class="tab-content active" id="system-tab">
                 <textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here">You are a friendly assistant editing a document with a user.
 
@@ -103,19 +102,21 @@ I came back home
 </artifact>
 </textarea>
             </div>
-                <label class="settings-label">Arfifact Editable By</label>
+            
+            <div class="edit-mode-container">
+                <label class="settings-label">Artifact Editable By</label>
                 <div style="display:flex; gap: 1rem;" class="radio-group">
                     <label>
-                    <input type="radio" name="editMode" value="llm only">
-		    LLM Only 
+                        <input type="radio" name="editMode" value="llm only"> LLM Only 
                     </label>
                     <label>
-	            <input type="radio" name="editMode" value="llm and user" checked>
-		    LLM and User 
+                        <input type="radio" name="editMode" value="llm and user" checked> LLM and User 
                     </label>
                 </div>
+            </div>
         </div>
     </div>
+    
     <script src="debug.js"></script>
     <script src="fetch-models.js"></script>
     <script src="resizing.js"></script>
