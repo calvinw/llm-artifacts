@@ -30,19 +30,36 @@ displayModeRadios.forEach(radio => {
 
 clearChatButton.addEventListener('click', () => {
     chatEngine.store.commit('clearMessages');
+console.log("needs user changes to true")
+    chatEngine.setLlmNeedsUserChanges(true);
 });
 
 // Get stored API key or use default for development
 const apiKey = '';
 const model = 'openai/gpt-4o-mini';
 
-let chatEngine = new ChatEngine({
-        apiKey: apiKey,
-        model: model,
-        systemPrompt: DEFAULT_SYSTEM_PROMPT
-})
+let chatEngine=null
 
-window.chatEngine = chatEngine;
+apiKeyInput.addEventListener('input', function(){
+console.log("hello")
+chatEngine = new ChatEngine({
+        apiKey: apiKeyInput.value,
+        model: model,
+        systemPrompt: DEFAULT_SYSTEM_PROMPT})
+
+	window.chatEngine = chatEngine;
+
+	chatEngine.subscribe("model", function(newValue){
+	     currentModelDisplay.textContent = newValue;
+	})
+    chatEngine.subscribe("artifact.content", renderPreview);
+    chatEngine.subscribe("artifact.content", updateArtifactUI);
+    chatEngine.subscribe("currentVersion", function(val) {
+        artifactVersion.textContent = `v${val}`;
+    });
+    chatEngine.subscribe("messages", updateMessagesUI);
+});
+
 
 // Add this function to handle file type changes
 function handleFileTypeChange(event) {
@@ -52,6 +69,9 @@ function handleFileTypeChange(event) {
     if (fileType === 'markdown') {
         newSystemPrompt = DEFAULT_MARKDOWN_SYSTEM_PROMPT;
         newArtifact = DEFAULT_MARKDOWN_ARTIFACT;
+    } else if (fileType === 'orderbot') {
+        newSystemPrompt = DEFAULT_ORDERBOT_SYSTEM_PROMPT;
+        newArtifact = DEFAULT_ORDERBOT_ARTIFACT;
     } else if (fileType === 'svg') {
         newSystemPrompt = DEFAULT_SVG_SYSTEM_PROMPT;
         newArtifact = DEFAULT_SVG_ARTIFACT;
@@ -60,8 +80,15 @@ function handleFileTypeChange(event) {
         newArtifact = DEFAULT_HTML_ARTIFACT;
     } 
 
+	chatEngine.setSystemMessage(newSystemPrompt)
+	chatEngine.clearMessages();
+	     chatEngine.store.commit('setArtifact', {
+		 ...newArtifact,
+	     });
+        chatEngine.setLlmNeedsUserChanges(true);
+
     // Update system prompt
-    // systemPromptTextarea.value = newSystemPrompt;
+    systemPromptTextarea.value = newSystemPrompt;
     //
     //
     // chatEngine.store.state.messages[0].content = newSystemPrompt;
@@ -100,20 +127,10 @@ function handleClearRevisions() {
 fileTypeSelect.addEventListener('change', handleFileTypeChange);
 clearRevisionsButton.addEventListener('click', handleClearRevisions);
 
-// Initialize file type select with current value
-fileTypeSelect.value = chatEngine.getArtifact().type === 'text/markdown' ? 'markdown' : 'svg';
-
-// Initialize API key input, model display, and system prompt
-apiKeyInput.value = apiKey;
-systemPromptTextarea.value = chatEngine.getMessages()[0].content;
-
 modelSelect.addEventListener('change', function() {
     chatEngine.store.commit("setModel", this.value);
 });
 
-chatEngine.subscribe("model", function(newValue){
-     currentModelDisplay.textContent = newValue;
-});
 
 // Add this to your setupSubscriptions function
 // chatEngine.subscribe("artifact.version", updateRevisionNavigationButtons);
@@ -181,15 +198,6 @@ systemPromptTextarea.addEventListener('change', function() {
         chatEngine.store.commit('setSystemMessage', newSystemPrompt);
     }
 });
-
-function setupSubscriptions() {
-    chatEngine.subscribe("artifact.content", renderPreview);
-    chatEngine.subscribe("artifact.content", updateArtifactUI);
-    chatEngine.subscribe("currentVersion", function(val) {
-        artifactVersion.textContent = `v${val}`;
-    });
-    chatEngine.subscribe("messages", updateMessagesUI);
-}
 
 function renderPreview() {
     const artifact = chatEngine.getArtifact();
@@ -321,9 +329,8 @@ artifactContent.addEventListener('change', (e) => {
 });
 
 // Initial setup
-setupSubscriptions();
-updateMessagesUI();
-updateArtifactUI();
+//updateMessagesUI();
+//updateArtifactUI();
 
 
  async function sendInitialMessages(messages) {

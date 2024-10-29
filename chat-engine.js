@@ -277,6 +277,15 @@ class ChatEngine {
         return this.store.state.artifact;
     }
 
+    setSystemMessage(value) {
+        this.store.commit('setSystemMessage', value);
+    }
+
+    clearMessages() {
+        this.store.commit('clearMessages');
+    }
+
+
     // Add this method to the class
     debug() {
         const state = this.store.state;
