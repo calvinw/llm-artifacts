@@ -33,7 +33,7 @@ clearChatButton.addEventListener('click', () => {
 });
 
 // Get stored API key or use default for development
-const apiKey = '';
+const apiKey = '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';
 const model = 'openai/gpt-4o-mini';
 
 let chatEngine = new ChatEngine({

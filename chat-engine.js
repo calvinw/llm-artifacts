@@ -56,6 +56,7 @@ class ChatEngine {
                 model: "openai/gpt-4o-mini",
                 artifact: DEFAULT_ARTIFACT,
                 llmNeedsUserChanges: true,
+		exchangeVersion: 0,
                 currentVersion: 1,
                 changedSinceRevision: false,
                 revisions: [DEFAULT_ARTIFACT],
@@ -74,6 +75,9 @@ class ChatEngine {
                 },
                 setLlmNeedsUserChanges: (state, llmNeedsUserChanges) => {
                     state.llmNeedsUserChanges = llmNeedsUserChanges;
+                },
+                setExchangeVersion: (state, exchangeVersion) => {
+                    state.exchangeVersion = exchangeVersion 
                 },
                 setCurrentVersion: (state, currentVersion) => {
                     state.artifact.content = currentVersion 
@@ -115,7 +119,7 @@ class ChatEngine {
         });
     }
 
-    extractAndSaveArtifact(text) {
+    extractAndUpdateArtifact(text) {
         const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
         const match = pattern.exec(text);
         
@@ -130,8 +134,18 @@ class ChatEngine {
             const [, key, value] = attrMatch;
             attributes[key] = value;
         }
-          
-        console.log ("attributes version: " + attributes.version) 
+        
+	const llmsReturnedVersion = parseInt(attributes.version)
+	const exchangeVersion = this.store.state.exchangeVersion; 
+
+        console.log ("LLMs returned version: " + llmsReturnedVersion) 
+        console.log ("exchange version: " + exchangeVersion) 
+
+	if(llmsReturnedVersion == exchangeVersion+1) {
+	    console.log("got expected exchange version")
+	    this.store.commit("setExchangeVersion", exchangeVersion+1)
+	}
+
         if(attributes.version) 
            delete attributes.version
 
@@ -144,11 +158,10 @@ class ChatEngine {
     }
    
     async sendMessage(userMessage) {
-       
+      console.log("hi") 
         let fullUserMessage = userMessage 
         const userMessageHasArtifact = this.store.state.llmNeedsUserChanges;
-      console.log("sendMessage: llmNeedsUserChanges" +  
-                       this.store.state.llmNeedsUserChanges)
+        console.log("sendMessage: llmNeedsUserChanges: " +  this.store.state.llmNeedsUserChanges)
         if(userMessageHasArtifact) {
           fullUserMessage += "\n\n"
           fullUserMessage += this.prepareArtifact()
@@ -163,7 +176,7 @@ class ChatEngine {
         try {
             const response = await this.makeApiRequest(fullUserMessage);
             const aiMessage = response.choices[0].message.content;
-            const aiMessageHasArtifact = this.extractAndSaveArtifact(aiMessage);
+            const aiMessageHasArtifact = this.extractAndUpdateArtifact(aiMessage);
             
             this.store.commit("setLlmNeedsUserChanges", false)
             this.store.commit('addMessage', {
@@ -203,11 +216,17 @@ class ChatEngine {
     }
 
     prepareArtifact() {
+	let version = this.store.state.exchangeVersion;
+        console.log("preparing Artifact: exchangeVersion is " , version)
+	this.store.commit("setExchangeVersion", version+1); 
+        console.log("we expect the next version to be: " , this.store.state.exchangeVersion)
+	version = this.store.state.exchangeVersion;
+
         const identifier = this.store.state.artifact.identifier;
         const content = this.store.state.artifact.content;
         const  title = this.store.state.artifact.title;
         const  type = this.store.state.artifact.type;
-        return `<artifact identifier="${identifier}" type="${type}" title="${title}" version="user"> ${content} </artifact>`;
+        return `<artifact identifier="${identifier}" type="${type}" title="${title}" version="${version}"> ${content} </artifact>`;
     }
 
     cleanupOldArtifacts() {
@@ -272,7 +291,8 @@ class ChatEngine {
             },
             llmNeedsUserChanges: state.llmNeedsUserChanges,
             changedSinceRevision: state.changedSinceRevision,
-            currentVersio: state.lastSavedRevision,
+	    exchangeVersion: state.exchangeVersion,
+            currentVersion: state.currentVersion,
             revisions: state.revisions,
             messages: state.messages.map(msg => ({
                 role: msg.role,
