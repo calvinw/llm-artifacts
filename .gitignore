@@ -1,2 +1,5 @@
 *backup*
 ignore/
+node_modules/
+.env
+llm-artifacts-env/

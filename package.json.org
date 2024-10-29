@@ -1,0 +1,25 @@
+{
+  "name": "cli-chat",
+  "version": "1.0.0",
+  "description": "Command line chat interface for LLMs with artifact support",
+  "main": "cli-chat.js",
+  "type": "module",
+  "bin": {
+    "cli-chat": "./cli-chat.js"
+  },
+  "scripts": {
+    "start": "node cli-chat.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "chat",
+    "llm",
+    "openrouter"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

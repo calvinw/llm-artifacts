@@ -3,123 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+    <title>Chat App</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <script>
-    MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-            processEscapes: true,
-            processEnvironments: true
-        },
-        options: {
-            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-        }
-    };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="artifact-editor-styles.css" rel="stylesheet">
 </head>
 <body>
-    <div id="container">
-        <div id="panel1">
-            <div class="panel-content">
-                <label for="apiKey" class="settings-label">OpenRouter API Key:</label>
-                <input type="password" 
-                       id="apiKey" 
-                       class="settings-input" 
-                       placeholder="Enter your API key">
-                <div id="settingsError" class="error-message"></div>
-                <label for="model" class="settings-label">OpenRouter Model:</label>
-                <select id="model">
-                    <option value=""></option>
+    <!-- Sidebar Toggle Button -->
+    <button class="btn btn-primary toggle-sidebar" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+        <i class="bi bi-gear-fill"></i> Settings
+    </button>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Settings</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-3">
+                <label class="form-label">OpenRouter API Key</label>
+                <input type="password" class="form-control" id="apiKey">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="model">
+                    <option value="">Select a model</option>
                 </select>
-                <label class="settings-label">Render Mode:</label>
-                <div style="display:flex; gap: 1rem;" class="radio-group">
-                    <label>
-                        <input type="radio" name="renderMode" value="text"> Text
-                    </label>
-                    <label>
-                        <input type="radio" name="renderMode" value="markdown" checked> Markdown
+            </div>
+            <hr>
+            <div id="settingsError" class="alert alert-danger mt-3 d-none">
+                <!-- Error messages will be displayed here -->
+            </div>
+            <div id="modelInfo" class="mt-3">
+                <!-- Model info will be displayed here -->
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Render Messages As:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="displayMode" id="displayText" value="text" checked>
+                    <label class="form-check-label" for="displayText">
+                        Text
                     </label>
                 </div>
-                <input id="clearChatButton" value="Clear Chat Messages" type="button">
-                <div id="modelInfo"></div>
-            </div>
-        </div>
-        
-        <div id="divider"></div>
-        
-        <div id="panel2">
-            <div class="chat-container" id="chatContainer"></div>
-            <div class="chat-input-container">
-                <fieldset role="group">
-                    <textarea id="chatInput" class="chat-input" placeholder="Can you give me the artifact to work on..."></textarea>
-                    <button id="chatButton" value="Send">Send</button>
-                </fieldset>
-            </div>
-        </div>
-        
-        <div id="divider2"></div>
-        
-        <div id="panel3">
-            <div class="tabs">
-                <span class="tab-label" data-tab="artifact">Preview</span>
-                <span class="tab-label" data-tab="code">Code<span id="codeChangeIndicator" style="display:none;color:red;">*</span></span>
-                <span class="tab-label active" data-tab="system">System Prompt</span>
-            </div>
-            
-            <div class="tab-content" id="artifact-tab">
-                Artifact Content will go here 
-            </div>
-            
-            <div class="tab-content" id="code-tab">
-                <div id="codeArea"></div>
-            </div>
-            
-            <div class="tab-content active" id="system-tab">
-                <textarea id="systemPrompt" class="system-prompt" placeholder="Enter optional system prompt here">You are a friendly assistant editing a document with a user.
-
-You and the user will work on an document about their summer vacation together. The document will be markdown and the content of the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
-
-When you make changes to the document you will tell the user what was changed and then include the artifact document at the end of your response. Before you send the artifact document to the user you will update the version number. If the user sends you the artifact with a new version number then you respond you see the changes and ask if the user wants you to make further changes.
-
-Example:
-<artifact identifier="my-summer-vacation" title="My Summer Vacation" type="text/markdown" version="1">
-# My Summer Vacation
-
-## The Start
-In the first part of the summer I went to the beach. I had a great time and played outside all day long. It was *really* very fun.
-
-## The Middle
-Then I went to the **mountains** 
-
-## The End
-I came back home 
-
-</artifact>
-</textarea>
-            </div>
-            
-            <div class="edit-mode-container">
-                <label class="settings-label">Artifact Editable By</label>
-                <div style="display:flex; gap: 1rem;" class="radio-group">
-                    <label>
-                        <input type="radio" name="editMode" value="llm only"> LLM Only 
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="displayMode" id="displayTextArtifacts" value="textArtifacts">
+                    <label class="form-check-label" for="displayTextArtifacts">
+                        Text with Artifacts
                     </label>
-                    <label>
-                        <input type="radio" name="editMode" value="llm and user" checked> LLM and User 
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="displayMode" id="displayMarkdown" value="markdown">
+                    <label class="form-check-label" for="displayMarkdown">
+                        Markdown (Artifacts Hidden)
                     </label>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script src="debug.js"></script>
+    <!-- Main Content -->
+    <div class="main-content p-4">
+        <div class="chat-columns d-flex">
+            <!-- Messages Section -->
+            <div class="chat-column">
+          <div class="messages-panel">
+              <div class="messages-header">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h3>Artifact Editor</h3>
+                      <div class="d-flex gap-2 align-items-center">
+                          <span id="current-model" class="badge bg-secondary"></span>
+                          <button class="btn btn-outline-secondary btn-sm" id="clear-chat">
+                              <i class="bi bi-trash"></i> Clear Chat
+                          </button>
+                      </div>
+                  </div>
+                  <ul class="nav nav-tabs" role="tablist">
+                      <li class="nav-item" role="presentation">
+                          <button class="nav-link active" id="messages-tab" data-bs-toggle="tab" 
+                                  data-bs-target="#messages-pane" type="button" role="tab">
+                              Messages
+                          </button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                          <button class="nav-link" id="system-tab" data-bs-toggle="tab" 
+                                  data-bs-target="#system-pane" type="button" role="tab">
+                              System
+                          </button>
+                      </li>
+                  </ul>
+              </div>
+               <div class="tab-content flex-grow-1">
+                  <div class="tab-pane fade show active" id="messages-pane" role="tabpanel">
+                      <div class="messages-content">
+                          <div id="messages"></div>
+                      </div>
+                      <div class="input-container">
+                          <div class="input-group">
+                              <textarea class="form-control" id="message-input" placeholder="Type your message..."></textarea>
+                              <button class="btn btn-primary align-self-stretch" id="send-button">Send</button>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="tab-pane fade" id="system-pane" role="tabpanel">
+                      <textarea class="form-control system-prompt" id="system-prompt"></textarea>
+                  </div>
+              </div>
+          </div>
+
+            </div>
+            
+            <!-- Artifact Section -->
+            <!----->
+            <div class="chat-column ps-4" style="width: 50%;">
+                <div class="mb-2 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold" id="artifact-title"></span>
+                        <select class="form-select form-select-sm ms-2" id="file-type-select" style="width: auto;">
+                            <option value="markdown">Markdown</option>
+                            <option value="svg">SVG</option>
+                            <option value="html">HTML</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" id="prev-version" disabled>
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <span class="btn btn-outline-secondary" id="artifact-version"></span>
+                            <button class="btn btn-outline-secondary" id="next-version" disabled>
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" id="clear-revisions">
+                            <i class="bi bi-trash"></i> Clear Revisions
+                        </button>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs" id="artifactTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="artifact-tab" data-bs-toggle="tab" 
+                                data-bs-target="#artifact" type="button" role="tab">
+                            Artifact
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="preview-tab" data-bs-toggle="tab" 
+                                data-bs-target="#preview" type="button" role="tab">
+                            Preview
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content artifact-tab-content">
+                    <div class="tab-pane fade show active" id="artifact" role="tabpanel">
+                        <textarea class="form-control border-top-0" id="artifact-content"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="preview" role="tabpanel">
+                    </div>
+                </div>
+            </div>
+            <!----->
+
+        </div>
+    </div>
+
+    <!-- Add Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- In index.html, before the bootstrap-app.js script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="fetch-models.js"></script>
-    <script src="resizing.js"></script>
-    <script src="script.js"></script>
+    <script src="defaults.js"></script>
+    <script type="module" src="artifact-editor.js"></script>
 </body>
 </html>

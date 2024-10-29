@@ -1,0 +1,289 @@
+// Constants
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful AI assistant.';
+const DEFAULT_ARTIFACT = {
+    identifier: 'my-document',
+    type: 'text/markdown',
+    title: 'My Document',
+    version: 0,
+    content: '# Hello World\nI am king of rock and roll!\nFive figure five figure Hot Dog jumping Frog'
+};
+
+// Helper functions
+const getNestedProperty = (obj, path) => {
+    if (typeof path !== 'string') path = String(path);
+    return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+};
+
+class Store {
+    constructor(options = {}) {
+        this.state = options.state || {};
+        this.mutations = options.mutations || {};
+        this.subscribers = [];
+    }
+
+    commit(mutation, payload) {
+        if (!this.mutations[mutation]) {
+            console.error(`Mutation ${mutation} does not exist`);
+            return;
+        }
+        
+        const prevState = JSON.parse(JSON.stringify(this.state));
+        this.mutations[mutation](this.state, payload);
+        this.notifySubscribers(prevState);
+    }
+
+    subscribe(path, fn) {
+        this.subscribers.push({ path, fn });
+        // Immediately call with current value
+        const currentValue = getNestedProperty(this.state, path);
+        fn(currentValue, undefined);
+    }
+
+    notifySubscribers(prevState) {
+        this.subscribers.forEach(({ path, fn }) => {
+            const newValue = getNestedProperty(this.state, path);
+            const prevValue = getNestedProperty(prevState, path);
+            if (JSON.stringify(newValue) !== JSON.stringify(prevValue)) {
+                fn(newValue, prevValue);
+            }
+        });
+    }
+}
+
+class ChatEngine {
+    constructor(config) {
+        if (!config.apiKey) throw new Error('API key is required');
+        if (!config.model) throw new Error('Model name is required');
+
+        this.apiKey = config.apiKey;
+        this.model = config.model;
+        this.setupStore(config.systemPrompt);
+    }
+
+    setupStore(systemPrompt) {
+        this.store = new Store({
+            state: {
+                artifact: {
+                    ...DEFAULT_ARTIFACT,
+                    changed: false
+                },
+                revisions: [DEFAULT_ARTIFACT],
+                messages: [{
+                    role: 'system',
+                    content: systemPrompt || DEFAULT_SYSTEM_PROMPT,
+                    containsArtifact: false
+                }]
+            },
+            mutations: {
+                setArtifact: (state, artifactData) => {
+                    state.artifact = { ...state.artifact, ...artifactData };
+                },
+                setArtifactContent: (state, content) => {
+                    state.artifact.content = content;
+                },
+                setArtifactChanged: (state, changed) => {
+                    state.artifact.changed = changed;
+                },
+                incrementArtifactVersion: (state) => {
+                    state.artifact.version += 1;
+                },
+                saveRevision: (state, version) => {
+                    state.revisions[version] = {
+                        identifier: state.artifact.identifier,
+                        type: state.artifact.type,
+                        title: state.artifact.title,
+                        version: version,
+                        content: state.artifact.content
+                    };
+                },
+                addMessage: (state, message) => {
+                    state.messages.push(message);
+                },
+                removeArtifact: (state, index) => {
+                    state.messages[index].content = this.removeArtifacts(state.messages[index].content);
+                },
+                clearMessages: (state) => {
+                    state.messages = [{
+                        role: 'system',
+                        content: state.messages[0].content,
+                        containsArtifact: false
+                    }];
+                }
+            }
+        });
+
+        // Auto-save revisions when version changes
+        this.store.subscribe("artifact.version", (version) => {
+            this.store.commit("saveRevision", version);
+        });
+    }
+
+    extractArtifact(text) {
+        const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
+        const match = pattern.exec(text);
+        
+        if (!match) return false;
+
+        const [, attributesString, content] = match;
+        const attributes = {};
+        const attributePattern = /(\w+)="([^"]*)"/g;
+        let attrMatch;
+        
+        while ((attrMatch = attributePattern.exec(attributesString))) {
+            const [, key, value] = attrMatch;
+            attributes[key] = value;
+        }
+        
+        attributes.version = parseInt(attributes.version);
+        this.store.commit('setArtifact', {
+            ...attributes,
+            content: content.trim(),
+            changed: false
+        });
+        
+        return true;
+    }
+
+    async sendMessage(userMessage) {
+        const messageHasArtifact = this.prepareMessage(userMessage);
+        const preparedMessage = messageHasArtifact ? 
+            this.appendArtifactToMessage(userMessage) : userMessage;
+
+        this.store.commit('addMessage', {
+            role: "user",
+            content: preparedMessage,
+            hasArtifact: messageHasArtifact
+        });
+
+        try {
+            const response = await this.makeApiRequest(preparedMessage);
+            const aiMessage = response.choices[0].message.content;
+            const hasArtifact = this.extractArtifact(aiMessage);
+            
+            this.store.commit('addMessage', {
+                role: 'assistant',
+                content: aiMessage,
+                hasArtifact
+            });
+            
+            this.cleanupOldArtifacts();
+            return aiMessage;
+        } catch (error) {
+            console.error('Error:', error.message);
+            throw error;
+        }
+    }
+
+    async makeApiRequest(message) {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'Chat App'
+            },
+            body: JSON.stringify({
+                model: this.model,
+                messages: this.getMessages()
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return response.json();
+    }
+
+    prepareMessage(userMessage) {
+        if (this.store.state.artifact.changed || this.store.state.messages.length === 1) {
+            this.store.commit('incrementArtifactVersion');
+            this.store.commit('setArtifactChanged', false);
+            return true;
+        }
+        return false;
+    }
+
+    appendArtifactToMessage(userMessage) {
+        const { identifier, type, title, version, content } = this.store.state.artifact;
+        return `${userMessage}\n\n<artifact identifier="${identifier}" type="${type}" title="${title}" version="${version}"> ${content} </artifact>`;
+    }
+
+    cleanupOldArtifacts() {
+        const currentVersion = this.store.state.artifact.version;
+        const messages = this.store.state.messages;
+        const keepVersions = [currentVersion, currentVersion - 1];
+
+        for (let i = 1; i < messages.length; i++) {
+            const message = messages[i];
+            if (!message.hasArtifact) continue;
+
+            const artifactMatch = message.content.match(
+                /<artifact\s+.*?version="(\d+)".*?>[\s\S]*?<\/artifact>/
+            );
+            
+            if (artifactMatch) {
+                const version = parseInt(artifactMatch[1]);
+                if (!keepVersions.includes(version)) {
+                    this.store.commit('removeArtifact', i);
+                    messages[i].hasArtifact = false;
+                }
+            }
+        }
+    }
+
+    // Public API methods
+    subscribe(property, changeHandler) {
+        this.store.subscribe(property, changeHandler);
+    }
+
+    removeArtifacts(text) {
+        return text.replace(/<artifact\s+.*?>[\s\S]*?<\/artifact>/g, '').trim();
+    }
+
+    setArtifactContent(content) {
+        this.store.commit('setArtifactContent', content);
+    }
+
+    setArtifactChanged(value) {
+        this.store.commit('setArtifactChanged', value);
+    }
+
+    getMessages() {
+        return this.store.state.messages;
+    }
+
+    getArtifact() {
+        return this.store.state.artifact;
+    }
+
+    // Add this method to the class
+    debug() {
+        const state = this.store.state;
+        
+        // Create a clean copy without circular references
+        const cleanState = JSON.parse(JSON.stringify({
+            artifact: {
+                identifier: state.artifact.identifier,
+                type: state.artifact.type,
+                title: state.artifact.title,
+                version: state.artifact.version,
+                changed: state.artifact.changed,
+                content: state.artifact.content
+            },
+            revisions: state.revisions,
+            messages: state.messages.map(msg => ({
+                role: msg.role,
+                content: msg.content,
+                hasArtifact: msg.hasArtifact
+            }))
+        }));
+
+        console.log('=== ChatEngine State ===');
+        console.log(JSON.stringify(cleanState, null, 2));
+        return cleanState; // Return for further inspection
+    }
+}
+
+export default ChatEngine;

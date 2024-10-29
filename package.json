@@ -1,0 +1,39 @@
+{
+  "name": "cli-chat",
+  "version": "1.0.0",
+  "description": "Command line chat interface for LLMs with artifact support",
+  "main": "cli-chat.js",
+  "type": "module",
+  "bin": {
+    "cli-chat": "cli-chat.js"
+  },
+  "scripts": {
+    "start": "node cli-chat.js",
+    "start:default": "node cli-chat.js sk-or-v1-default anthropic/claude-3-haiku ./test.md",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "chat",
+    "llm",
+    "openrouter"
+  ],
+  "author": "calvinw",
+  "license": "MIT",
+  "dependencies": {
+    "connect-livereload": "^0.6.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "livereload": "^0.9.3",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calvinw/llm-artifacts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/calvinw/llm-artifacts/issues"
+  },
+  "homepage": "https://github.com/calvinw/llm-artifacts#readme"
+}

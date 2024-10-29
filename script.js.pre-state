@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         type: '',
         title: '',
         version: '',
-        changed: false,
+        changed: true,
         content: null 
     };
 
@@ -326,73 +326,3 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/'/g, "&#039;");
     }
 
-    function rerenderMessages() {
-        chatContainer.innerHTML = '';
-        messages.forEach((msg) => {
-            if (msg.role !== 'system') {
-                const { messageElement, textElement } = createMessageElement(msg.content, msg.role);
-                chatContainer.appendChild(messageElement);
-            }
-        });
-        scrollToBottom();
-
-        if (renderMode === 'markdown') {
-            MathJax.typesetPromise([chatContainer]).catch((err) => console.error(err.message));
-        }
-    }
-
-    // Observe changes in the chat container
-    const resizeObserver = new ResizeObserver(() => {
-        scrollToBottom();
-    });
-    resizeObserver.observe(chatContainer);
-
-    window.addEventListener('load', function () {
-        MathJax.startup.promise.then(() => {
-            MathJax.typesetPromise().catch((err) => console.error(err.message));
-        });
-    });
-
-    // Initial update of system message
-    updateSystemMessage();
-
-    // Artifact-related functions
-    const MIME_TYPES = {
-        "text/html": "HTML",
-        "text/markdown": "Markdown",
-        "image/svg+xml": "SVG",
-        "application/x-python": "Python",
-        "application/javascript": "JavaScript",
-        "text/css": "CSS",
-        "application/json": "JSON",
-        "text/csv": "CSV",
-        "text/plain": "Plain text"
-    };
-
-    function extractArtifact(artifact, text) {
-        const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
-        let match = pattern.exec(text);
-
-        if (match) {
-            const attributesString = match[1];
-            artifact.content = match[2].trim();
-            const attributePattern = /(\w+)="([^"]*)"/g;
-            let attrMatch;
-            while ((attrMatch = attributePattern.exec(attributesString)) !== null) {
-                const [, key, value] = attrMatch;
-                if (key in artifact) {
-                    artifact[key] = value;
-                }
-            }
-            return true
-        }
-
-        return false;
-    }
-
-    function removeArtifacts(text) {
-        const pattern = /<artifact\s+.*?>[\s\S]*?<\/artifact>/g;
-        return text.replace(pattern, '').replace(/\n{3,}/g, '\n\n').trim();
-    }
-
-});

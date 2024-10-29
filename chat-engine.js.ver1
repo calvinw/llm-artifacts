@@ -1,0 +1,231 @@
+import fs from 'fs';
+
+// Store implementation for state management
+class Store {
+    constructor(options) {
+        this.state = options.state || {};
+        this.mutations = options.mutations || {};
+        this.subscribers = [];
+    }
+
+    commit(mutation, payload) {
+        if (this.mutations[mutation]) {
+            const prevState = JSON.parse(JSON.stringify(this.state));
+            this.mutations[mutation](this.state, payload);
+            this.notifySubscribers(prevState);
+        } else {
+            console.error(`Mutation ${mutation} does not exist`);
+        }
+    }
+
+    subscribe(path, fn) {
+        this.subscribers.push({ path, fn });
+    }
+
+    notifySubscribers(prevState) {
+        this.subscribers.forEach(({ path, fn }) => {
+            const newValue = getNestedProperty(this.state, path);
+            const prevValue = getNestedProperty(prevState, path);
+            if (JSON.stringify(newValue) !== JSON.stringify(prevValue)) {
+                fn(newValue, prevValue);
+            }
+        });
+    }
+
+    getState() {
+        return this.state;
+    }
+}
+
+function getNestedProperty(obj, path) {
+    if (typeof path !== 'string') {
+        path = String(path);
+    }
+    return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+}
+
+class ChatEngine {
+    constructor(config) {
+        this.apiKey = config.apiKey;
+        this.model = config.model;
+        this.systemPromptFile = config.systemPromptFile;
+        this.artifactFile = config.artifactFile;
+        this.messagesFile = config.messagesFile;
+
+        this.store = new Store({
+            state: {
+                artifact: {
+                    identifier: 'cli-document',
+                    type: 'text/markdown',
+                    title: 'CLI Document',
+                    version: 0,
+                    changed: false,
+                    content: ''
+                },
+                messages: [
+                    { role: 'system', content: this.loadSystemPrompt() }
+                ]
+            },
+            mutations: {
+                setArtifact(state, artifactData) {
+                    state.artifact = { ...state.artifact, ...artifactData };
+                },
+                setArtifactContent(state, content) {
+                    state.artifact.content = content;
+                },
+                setArtifactChanged(state, changed) {
+                    state.artifact.changed = changed;
+                },
+                incrementArtifactVersion(state) {
+                    state.artifact.version += 1;
+                },
+                addMessage(state, message) {
+                    state.messages.push(message);
+                },
+                clearMessages(state) {
+                    state.messages = [{ role: 'system', content: state.messages[0].content }];
+                },
+                setSystemPrompt(state, content) {
+                    state.messages[0].content = content;
+                }
+            }
+        });
+
+        // Set up default subscribers if files are provided
+        if (this.artifactFile) {
+            this.store.subscribe('artifact.content', (newValue) => {
+                fs.writeFileSync(this.artifactFile, newValue, 'utf8');
+            });
+        }
+
+        if (this.messagesFile) {
+            this.store.subscribe('messages', (messages) => {
+                const formattedContent = this.formatMessagesForMarkdown(messages);
+                fs.writeFileSync(this.messagesFile, formattedContent, 'utf8');
+            });
+        }
+    }
+
+    loadSystemPrompt() {
+        try {
+            return fs.readFileSync(this.systemPromptFile, 'utf8').trim();
+        } catch (error) {
+            console.warn(`Warning: Could not load system prompt from ${this.systemPromptFile}. Using default.`);
+            return 'You are a helpful AI assistant.';
+        }
+    }
+
+    extractArtifact(text) {
+        const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
+        let match = pattern.exec(text);
+
+        if (match) {
+            const attributesString = match[1];
+            const content = match[2].trim();
+            const attributes = {};
+            const attributePattern = /(\w+)="([^"]*)"/g;
+            let attrMatch;
+            while ((attrMatch = attributePattern.exec(attributesString)) !== null) {
+                const [, key, value] = attrMatch;
+                attributes[key] = value;
+            }
+            attributes.version = parseInt(attributes.version);
+            this.store.commit('setArtifact', {
+                ...attributes,
+                content,
+                changed: false
+            });
+            return true;
+        }
+        return false;
+    }
+
+    appendArtifactToMessage(userMessage) {
+        const artifact = this.store.state.artifact;
+        const artifactXml = `<artifact identifier="${artifact.identifier}" type="${artifact.type}" title="${artifact.title}" version="${artifact.version}">
+${artifact.content}
+</artifact>`;
+        return `${userMessage}\n\n${artifactXml}`;
+    }
+
+    formatMessagesForMarkdown(messages) {
+        const timestamp = new Date().toISOString();
+        let output = `# Chat Messages (Updated: ${timestamp})\n`;
+        
+        messages.forEach((msg, index) => {
+            output +=`----------------------------\n`
+            output += `${msg.role.toUpperCase()}: `;
+            output += `${msg.content}\n`;
+            output +=`----------------------------`
+        });
+        
+        return output;
+    }
+
+    async sendMessage(userMessage) {
+        // Prepare message
+        let finalMessage = userMessage;
+        if (this.store.state.artifact.changed || this.store.state.messages.length === 1) {
+            this.store.commit('incrementArtifactVersion');
+            this.store.commit('setArtifactChanged', false);
+            finalMessage = this.appendArtifactToMessage(userMessage);
+        }
+
+        this.store.commit('addMessage', { role: "user", content: finalMessage });
+
+        try {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': 'http://localhost',
+                    'X-Title': 'Chat App'
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    messages: this.store.state.messages
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const aiMessage = data.choices[0].message.content;
+            this.extractArtifact(aiMessage);
+            this.store.commit('addMessage', { role: 'assistant', content: aiMessage });
+            return aiMessage;
+        } catch (error) {
+            console.error('Error:', error.message);
+            throw error;
+        }
+    }
+
+    loadInitialArtifact() {
+        try {
+            const initialContent = fs.readFileSync(this.artifactFile, 'utf8');
+            this.store.commit('setArtifactContent', initialContent);
+            return true;
+        } catch (error) {
+            console.error('Error loading initial artifact:', error);
+            return false;
+        }
+    }
+
+    // Getters for state inspection
+    getMessages() {
+        return this.store.getState().messages;
+    }
+
+    getArtifact() {
+        return this.store.getState().artifact;
+    }
+
+    getSystemPrompt() {
+        return this.store.getState().messages[0].content;
+    }
+}
+
+export default ChatEngine;
