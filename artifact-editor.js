@@ -4,7 +4,7 @@ import ChatEngine from './chat-engine.js';
 const clearChatButton = document.getElementById('clear-chat');
 const messagesDiv = document.getElementById('messages');
 const previewDiv = document.getElementById('preview');
-const artifactContent = document.getElementById('artifact-content');
+//const artifactContent = document.getElementById('artifact-content');
 const artifactTitle = document.getElementById('artifact-title');
 const artifactVersion = document.getElementById('artifact-version');
 const messageInput = document.getElementById('message-input');
@@ -19,6 +19,24 @@ const nextVersionBtn = document.getElementById('next-version');
 const displayModeRadios = document.getElementsByName('displayMode');
 const fileTypeSelect = document.getElementById('file-type-select');
 const clearRevisionsButton = document.getElementById('clear-revisions');
+const artifactContentDiv = document.getElementById('artifact-content');
+
+let editor = null;
+editor = ace.edit("artifact-content");
+editor.setOptions({
+    selectionStyle: "text",
+    highlightActiveLine: false,
+    fontSize: "18px",
+    fontFamily: "Monaco, Menlo, 'Ubuntu Mono', 'Droid Sans Mono', Consolas, monospace",
+    showPrintMargin: false  // Removes the vertical line in the middle
+});
+editor.setTheme("ace/theme/github");
+editor.session.setOption("wrap", true);
+editor.session.setUseWrapMode(true);
+
+function resizeEditor() {
+    editor.resize();
+}
 
 // Add event listener for radio buttons
 displayModeRadios.forEach(radio => {
@@ -50,11 +68,12 @@ async function initializeChatEngine(apiKey) {
 	chatEngine.subscribe("model", function(newValue){
 	     currentModelDisplay.textContent = newValue;
 	})
+
     chatEngine.subscribe("artifact.content", renderPreview);
     chatEngine.subscribe("artifact.content", updateArtifactUI);
-    chatEngine.subscribe("currentVersion", function(val) {
-        artifactVersion.textContent = `v${val}`;
-    });
+    // chatEngine.subscribe("currentVersion", function(val) {
+    //     artifactVersion.textContent = `v${val}`;
+    // });
     chatEngine.subscribe("messages", updateMessagesUI);
 
 	chatEngine.subscribe("messages.0.content", function(content){
@@ -64,10 +83,10 @@ async function initializeChatEngine(apiKey) {
 	fileTypeSelect.value = DEFAULT_OPTION 
 
 const initialMessages = [
-     "Can you see my document?",
-     "Can you remove the red rectangle?",
-     "Can you remove the green rectangle?",
-     "Can you put in blue circle?",
+     //"Can you see my document?",
+     // "Can you remove the red rectangle?",
+     // "Can you remove the green rectangle?",
+     // "Can you put in blue circle?",
 ];
 
  for (const message of initialMessages) {
@@ -100,6 +119,7 @@ function handleFileTypeChange(event) {
 
 	chatEngine.setSystemMessage(newSystemPrompt)
 	chatEngine.clearMessages();
+  console.log("seting Artifact")
 	     chatEngine.store.commit('setArtifact', {
 		 ...newArtifact,
 	     });
@@ -107,14 +127,8 @@ function handleFileTypeChange(event) {
 }
 
 
-// Add this function to handle clearing revisions
-function handleClearRevisions() {
-	console.log("clear revisions not working yet");
-}
-
 // Add these event listeners
 fileTypeSelect.addEventListener('change', handleFileTypeChange);
-clearRevisionsButton.addEventListener('click', handleClearRevisions);
 
 modelSelect.addEventListener('change', function() {
     chatEngine.store.commit("setModel", this.value);
@@ -146,14 +160,34 @@ function renderPreview() {
 }
 
 // UI update functions
+
 function updateArtifactUI() {
+  console.log("updatingArtifactUI");
     const artifact = chatEngine.getArtifact();
     artifactTitle.textContent = artifact.title;
-    if (artifactContent.value != artifact.content) {
-        artifactContent.value = artifact.content;
+    console.log("artifact.content:" + artifact.content);
+    console.log("editor.getValue():" + editor.getValue());
+    if (editor.getValue() != artifact.content) {
+        console.log("actually updateing it");
+        editor.session.off("change", debouncedUpdate);
+        editor.setValue(artifact.content, -1);  // -1 moves cursor to start
+        editor.session.on("change", debouncedUpdate);
     }
-
 }
+
+const artifactTab = document.getElementById('artifact-tab');
+artifactTab.addEventListener('shown.bs.tab', function (e) {
+    if (editor) {
+        editor.resize();
+        editor.renderer.updateFull();
+        // Double check content is in sync
+        const artifact = chatEngine.getArtifact();
+        if (editor.getValue() !== artifact.content) {
+            console.log("SETTING CONTENT...WASNT SET");
+            editor.setValue(artifact.content, -1);
+        }
+    }
+});
 
 function updateMessagesUI() {
     const displayMode = document.querySelector('input[name="displayMode"]:checked').value;
@@ -248,14 +282,42 @@ messageInput.addEventListener('keypress', (e) => {
     }
 });
 
-artifactContent.addEventListener('change', (e) => {
-    const newValue = e.target.value;
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Debounced update function
+const debouncedUpdate = debounce(() => {
+    const newValue = editor.getValue();
     const artifact = chatEngine.getArtifact();
     if (newValue != artifact.content) {
+       console.log("debounced version")
+        chatEngine.setArtifactContent(newValue);
+        chatEngine.setLlmNeedsUserChanges(true);
+    }
+}, 1000);
+
+// Set up both listeners
+
+editor.session.on('change', debouncedUpdate);
+editor.on('blur', () => {
+    const newValue = editor.getValue();
+    const artifact = chatEngine.getArtifact();
+    if (newValue != artifact.content) {
+       console.log("new value sent")
         chatEngine.setArtifactContent(newValue);
         chatEngine.setLlmNeedsUserChanges(true);
     }
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof apiKey !== 'undefined' && apiKey) {

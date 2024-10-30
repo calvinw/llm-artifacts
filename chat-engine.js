@@ -235,7 +235,7 @@ class ChatEngine {
 
     prepareArtifact() {
 	let version = this.store.state.exchangeVersion;
-        console.log("preparing Artifact: exchangeVersion is " , version)
+        //console.log("preparing Artifact: exchangeVersion is " , version)
 	this.store.commit("setExchangeVersion", version+1); 
 	version = this.store.state.exchangeVersion;
 
