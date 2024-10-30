@@ -73,6 +73,8 @@ const ORDERBOT_ARTIFACT = {
     content: ORDERBOT_ARTIFACT_CONTENT
 };
 
+const ORDERBOT_OPTION = "orderbot"
+
 const MARKDOWN_SYSTEM_PROMPT = `
 You are a friendly assistant editing a document with a user.   
 
@@ -139,6 +141,8 @@ const MARKDOWN_ARTIFACT = {
     content: MARKDOWN_ARTIFACT_CONTENT
 };
 
+const MARKDOWN_OPTION = "markdown"
+
 const HTML_SYSTEM_PROMPT = `
 You are a friendly assistant editing some html with the user.
 
@@ -193,6 +197,8 @@ const HTML_ARTIFACT = {
     content: HTML_ARTIFACT_CONTENT
 };
 
+const HTML_OPTION = "html"
+
 const SVG_SYSTEM_PROMPT = `
 You are a friendly assistant editing an svg with the user.
 
@@ -237,7 +243,10 @@ const SVG_ARTIFACT = {
     content: SVG_ARTIFACT_CONTENT
 };
 
-const DEFAULT_ARTIFACT = DEFAULT_SVG_ARTIFACT; 
-const DEFAULT_ARTIFACT_CONTENT = DEFAULT_SVG_ARTIFACT_CONTENT; 
-const DEFAULT_SYSTEM_PROMPT  = DEFAULT_SVG_SYSTEM_PROMPT;
+const SVG_OPTION = "svg"
+
+const DEFAULT_ARTIFACT = SVG_ARTIFACT; 
+const DEFAULT_ARTIFACT_CONTENT = SVG_ARTIFACT_CONTENT; 
+const DEFAULT_SYSTEM_PROMPT  = SVG_SYSTEM_PROMPT;
+const DEFAULT_OPTION  = SVG_OPTION;
 

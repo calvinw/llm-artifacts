@@ -112,13 +112,32 @@ class ChatEngine {
                     state.messages = [{
                         role: 'system',
                         content: state.messages[0].content,
-                        hasArtifact: false
+                        containsArtifact: false
                     }];
                 }
             }
         });
     }
 
+	cleanupOldArtifacts() {
+	    const currentVersion = this.store.state.exchangeVersion;
+	    const minVersionToKeep = Math.max(0, currentVersion - 2); // Keep current and previous version
+
+	    this.store.state.messages.forEach((message, index) => {
+		if (!message.containsArtifact) return;
+
+		const versionMatch = message.content.match(/<artifact[^>]+version="(\d+)"/);
+		if (!versionMatch) return;
+
+		const version = parseInt(versionMatch[1]);
+		if (version < minVersionToKeep) {
+		    // Remove the artifact from the message content
+		    this.store.commit('removeArtifact', index);
+		    // Update the containsArtifact flag
+		    message.containsArtifact = false;
+		}
+	    });
+	}
     extractAndUpdateArtifact(text) {
         const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
         const match = pattern.exec(text);
@@ -168,7 +187,7 @@ class ChatEngine {
         this.store.commit('addMessage', {
             role: "user",
             content: fullUserMessage,
-            hasArtifact: userMessageHasArtifact 
+            containsArtifact: userMessageHasArtifact 
         });
 
         try {
@@ -180,9 +199,10 @@ class ChatEngine {
             this.store.commit('addMessage', {
                 role: 'assistant',
                 content: aiMessage,
-                hasArtifact: aiMessageHasArtifact
+                containsArtifact: aiMessageHasArtifact
             });
-            //this.cleanupOldArtifacts();
+
+            this.cleanupOldArtifacts();
 
             return aiMessage;
         } catch (error) {
@@ -224,29 +244,6 @@ class ChatEngine {
         const  title = this.store.state.artifact.title;
         const  type = this.store.state.artifact.type;
         return `<artifact identifier="${identifier}" type="${type}" title="${title}" version="${version}"> ${content} </artifact>`;
-    }
-
-    cleanupOldArtifacts() {
-        const currentVersion = this.store.state.artifact.version;
-        const messages = this.store.state.messages;
-        const keepVersions = [currentVersion, currentVersion - 1];
-
-        for (let i = 1; i < messages.length; i++) {
-            const message = messages[i];
-            if (!message.hasArtifact) continue;
-
-            const artifactMatch = message.content.match(
-                /<artifact\s+.*?version="(\d+)".*?>[\s\S]*?<\/artifact>/
-            );
-            
-            if (artifactMatch) {
-                const version = parseInt(artifactMatch[1]);
-                if (!keepVersions.includes(version)) {
-                    this.store.commit('removeArtifact', i);
-                    messages[i].hasArtifact = false;
-                }
-            }
-        }
     }
 
     // Public API methods

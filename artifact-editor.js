@@ -1,6 +1,5 @@
 import ChatEngine from './chat-engine.js';
 
-
 // DOM Elements - Move these to the top
 const clearChatButton = document.getElementById('clear-chat');
 const messagesDiv = document.getElementById('messages');
@@ -64,9 +63,13 @@ async function initializeChatEngine(apiKey) {
 	     systemPromptTextarea.value = content;
 	})
 
+	fileTypeSelect.value = DEFAULT_OPTION 
+
 const initialMessages = [
      "Can you see my document?",
-//      "Can you remove the red rectangle?",
+     "Can you remove the red rectangle?",
+     "Can you remove the green rectangle?",
+     "Can you put in blue circle?",
 ];
 
 // const initialMessages = [
