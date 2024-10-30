@@ -1,4 +1,102 @@
-  
+/* Resizable panels styles */
+.chat-columns {
+    display: flex;
+    width: 100%;
+    position: relative;
+    height: 100%;
+}
+
+.chat-column {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+    height: 100%;
+}
+
+.divider {
+    width: 4px;
+    background-color: #dee2e6;
+    cursor: col-resize;
+    margin: 0 -2px;
+    position: relative;
+    z-index: 100;
+}
+
+.divider:hover {
+    background-color: #6c757d;
+}
+
+.resizing {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Ensure panels take full height */
+.main-content {
+    height: calc(100vh - 2rem);
+}
+
+.messages-panel, .artifact-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-content, .artifact-tab-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+#artifact-content {
+    height: 100%;
+}
+
+.system-prompt {
+    height: 100%;
+}
+
+#preview {
+    height: 100%;
+    overflow-y: auto;
+    padding: 1rem;
+}
+/* Add styles for the resizable panels */
+.chat-columns {
+    display: flex;
+    width: 100%;
+    position: relative;
+}
+
+.chat-column {
+    flex: 1;
+    min-width: 200px; /* Minimum width for usability */
+    position: relative;
+}
+
+.divider {
+    width: 4px;
+    background-color: #dee2e6;
+    cursor: col-resize;
+    margin: 0 -2px;
+    position: relative;
+    z-index: 100;
+}
+
+.divider:hover {
+    background-color: #6c757d;
+}
+
+/* Prevent text selection during resize */
+.resizing {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+} 
+
+
 .form-check.form-switch {
     padding-left: 2.5em;
     margin-bottom: 0.5rem;

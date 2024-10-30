@@ -7,6 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="artifact-editor-styles.css" rel="stylesheet">
+    <style>
+    </style>
 </head>
 <body>
     <!-- Sidebar Toggle Button -->
@@ -14,6 +16,7 @@
         <i class="bi bi-gear-fill"></i> Settings
     </button>
 
+    <!-- Settings Sidebar -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Settings</h5>
@@ -60,121 +63,178 @@
             </div>
         </div>
     </div>
+
     <!-- Main Content -->
     <div class="main-content p-4">
-        <div class="chat-columns d-flex">
+        <div class="chat-columns">
             <!-- Messages Section -->
-            <div class="chat-column">
-          <div class="messages-panel">
-              <div class="messages-header">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h3>Artifact Editor</h3>
-                      <div class="d-flex gap-2 align-items-center">
-                          <span id="current-model" class="badge bg-secondary"></span>
-                          <button class="btn btn-outline-secondary btn-sm" id="clear-chat">
-                              <i class="bi bi-trash"></i> Clear Chat
-                          </button>
-                      </div>
-                  </div>
-                  <ul class="nav nav-tabs" role="tablist">
-                      <li class="nav-item" role="presentation">
-                          <button class="nav-link active" id="messages-tab" data-bs-toggle="tab" 
-                                  data-bs-target="#messages-pane" type="button" role="tab">
-                              Messages
-                          </button>
-                      </li>
-                      <li class="nav-item" role="presentation">
-                          <button class="nav-link" id="system-tab" data-bs-toggle="tab" 
-                                  data-bs-target="#system-pane" type="button" role="tab">
-                              System
-                          </button>
-                      </li>
-                  </ul>
-              </div>
-               <div class="tab-content flex-grow-1">
-                  <div class="tab-pane fade show active" id="messages-pane" role="tabpanel">
-                      <div class="messages-content">
-                          <div id="messages"></div>
-                      </div>
-                      <div class="input-container">
-                          <div class="input-group">
-                              <textarea class="form-control" id="message-input" placeholder="Type your message..."></textarea>
-                              <button class="btn btn-primary align-self-stretch" id="send-button">Send</button>
-                          </div>
-                      </div>
-                  </div>
-                  
-                  <div class="tab-pane fade" id="system-pane" role="tabpanel">
-                      <textarea class="form-control system-prompt" id="system-prompt"></textarea>
-                  </div>
-              </div>
-          </div>
-
+            <div class="chat-column" id="chat-panel">
+                <div class="messages-panel">
+                    <div class="messages-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3>Artifact Editor</h3>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span id="current-model" class="badge bg-secondary"></span>
+                                <button class="btn btn-outline-secondary btn-sm" id="clear-chat">
+                                    <i class="bi bi-trash"></i> Clear Chat
+                                </button>
+                            </div>
+                        </div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="messages-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#messages-pane" type="button" role="tab">
+                                    Messages
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="system-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#system-pane" type="button" role="tab">
+                                    System
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content flex-grow-1">
+                        <div class="tab-pane fade show active" id="messages-pane" role="tabpanel">
+                            <div class="messages-content">
+                                <div id="messages"></div>
+                            </div>
+                            <div class="input-container">
+                                <div class="input-group">
+                                    <textarea class="form-control" id="message-input" placeholder="Type your message..."></textarea>
+                                    <button class="btn btn-primary align-self-stretch" id="send-button">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="system-pane" role="tabpanel">
+                            <textarea class="form-control system-prompt" id="system-prompt"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
             
+            <!-- Divider for resizing -->
+            <div class="divider" id="resizer"></div>
+            
             <!-- Artifact Section -->
-            <!----->
-            <div class="chat-column ps-4" style="width: 50%;">
-                <div class="mb-2 d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <span class="fw-bold" id="artifact-title"></span>
-                        <select class="form-select form-select-sm ms-2" id="file-type-select" style="width: auto;">
-                            <option value="markdown" selected>Markdown</option>
-                            <option value="svg">SVG</option>
-                            <option value="html">HTML</option>
-                            <option value="orderbot">Order Bot</option>
-                        </select>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-secondary" id="prev-version" disabled>
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
-                            <span class="btn btn-outline-secondary" id="artifact-version"></span>
-                            <button class="btn btn-outline-secondary" id="next-version" disabled>
-                                <i class="bi bi-chevron-right"></i>
+            <div class="chat-column" id="artifact-panel">
+                <div class="artifact-panel">
+                    <div class="mb-2 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <span class="fw-bold" id="artifact-title"></span>
+                            <select class="form-select form-select-sm ms-2" id="file-type-select" style="width: auto;">
+                                <option value="markdown" selected>Markdown</option>
+                                <option value="svg">SVG</option>
+                                <option value="html">HTML</option>
+                                <option value="orderbot">Order Bot</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary" id="prev-version" disabled>
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <span class="btn btn-outline-secondary" id="artifact-version"></span>
+                                <button class="btn btn-outline-secondary" id="next-version" disabled>
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </div>
+                            <button class="btn btn-outline-secondary btn-sm ms-2" id="clear-revisions">
+                                <i class="bi bi-trash"></i> Clear Revisions
                             </button>
                         </div>
-                        <button class="btn btn-outline-secondary btn-sm ms-2" id="clear-revisions">
-                            <i class="bi bi-trash"></i> Clear Revisions
-                        </button>
                     </div>
-                </div>
 
-                <ul class="nav nav-tabs" id="artifactTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="artifact-tab" data-bs-toggle="tab" 
-                                data-bs-target="#artifact" type="button" role="tab">
-                            Artifact
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="preview-tab" data-bs-toggle="tab" 
-                                data-bs-target="#preview" type="button" role="tab">
-                            Preview
-                        </button>
-                    </li>
-                </ul>
+                    <ul class="nav nav-tabs" id="artifactTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="artifact-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#artifact" type="button" role="tab">
+                                Artifact
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="preview-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#preview" type="button" role="tab">
+                                Preview
+                            </button>
+                        </li>
+                    </ul>
 
-                <div class="tab-content artifact-tab-content">
-                    <div class="tab-pane fade show active" id="artifact" role="tabpanel">
-                        <textarea class="form-control border-top-0" id="artifact-content"></textarea>
-                    </div>
-                    <div class="tab-pane fade" id="preview" role="tabpanel">
+                    <div class="tab-content artifact-tab-content">
+                        <div class="tab-pane fade show active" id="artifact" role="tabpanel">
+                            <textarea class="form-control border-top-0" id="artifact-content"></textarea>
+                        </div>
+                        <div class="tab-pane fade" id="preview" role="tabpanel">
+                        </div>
                     </div>
                 </div>
             </div>
-            <!----->
-
         </div>
     </div>
 
     <!-- Add Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<!-- In index.html, before the bootstrap-app.js script -->
+    
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="fetch-models.js"></script>
     <script src="defaults.js"></script>
     <script type="module" src="artifact-editor.js"></script>
+    
+    <!-- Resizer Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const resizer = document.getElementById('resizer');
+            const chatPanel = document.getElementById('chat-panel');
+            const artifactPanel = document.getElementById('artifact-panel');
+            let isResizing = false;
+            let startX;
+            let startWidthChat;
+            let startWidthArtifact;
+
+            resizer.addEventListener('mousedown', initResize);
+
+            function initResize(e) {
+                isResizing = true;
+                startX = e.clientX;
+                startWidthChat = chatPanel.offsetWidth;
+                startWidthArtifact = artifactPanel.offsetWidth;
+                
+                document.body.classList.add('resizing');
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+            }
+
+            function resize(e) {
+                if (!isResizing) return;
+                
+                const dx = e.clientX - startX;
+                const totalWidth = chatPanel.parentElement.offsetWidth;
+                
+                const newWidthChat = startWidthChat + dx;
+                const newWidthArtifact = startWidthArtifact - dx;
+                
+                // Set minimum widths (20% of total width)
+                const minWidth = totalWidth * 0.2;
+                
+                if (newWidthChat >= minWidth && newWidthArtifact >= minWidth) {
+                    const chatPercentage = (newWidthChat / totalWidth) * 100;
+                    const artifactPercentage = (newWidthArtifact / totalWidth) * 100;
+                    
+                    chatPanel.style.flex = `0 0 ${chatPercentage}%`;
+                    artifactPanel.style.flex = `0 0 ${artifactPercentage}%`;
+                }
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.body.classList.remove('resizing');
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('mouseup', stopResize);
+            }
+        });
+    </script>
 </body>
 </html>

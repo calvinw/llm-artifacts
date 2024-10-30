@@ -35,15 +35,15 @@ console.log("needs user changes to true")
 });
 
 // Get stored API key or use default for development
-const apiKey = '';
+const apiKey ="" 
 const model = 'openai/gpt-4o-mini';
 
-let chatEngine=null
+let chatEngine = null;
 
-apiKeyInput.addEventListener('input', function(){
-console.log("hello")
-chatEngine = new ChatEngine({
-        apiKey: apiKeyInput.value,
+function initializeChatEngine(apiKey) {
+
+  chatEngine = new ChatEngine({
+        apiKey: apiKey,
         model: model,
         systemPrompt: DEFAULT_SYSTEM_PROMPT})
 
@@ -58,8 +58,7 @@ chatEngine = new ChatEngine({
         artifactVersion.textContent = `v${val}`;
     });
     chatEngine.subscribe("messages", updateMessagesUI);
-});
-
+}
 
 // Add this function to handle file type changes
 function handleFileTypeChange(event) {
@@ -88,7 +87,7 @@ function handleFileTypeChange(event) {
         chatEngine.setLlmNeedsUserChanges(true);
 
     // Update system prompt
-    systemPromptTextarea.value = newSystemPrompt;
+    //systemPromptTextarea.value = newSystemPrompt;
     //
     //
     // chatEngine.store.state.messages[0].content = newSystemPrompt;
@@ -328,10 +327,20 @@ artifactContent.addEventListener('change', (e) => {
     }
 });
 
-// Initial setup
-//updateMessagesUI();
-//updateArtifactUI();
-
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof apiKey !== 'undefined' && apiKey) {
+        apiKeyInput.value = apiKey;
+        initializeChatEngine(apiKey);
+    }
+    else {
+        apiKeyInput.addEventListener('input', function() {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                initializeChatEngine(key);
+            }
+        });
+    }
+});
 
  async function sendInitialMessages(messages) {
  for (const message of messages) {
