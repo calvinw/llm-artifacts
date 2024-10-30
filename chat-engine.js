@@ -158,10 +158,8 @@ class ChatEngine {
     }
    
     async sendMessage(userMessage) {
-      console.log("hi") 
         let fullUserMessage = userMessage 
         const userMessageHasArtifact = this.store.state.llmNeedsUserChanges;
-        console.log("sendMessage: llmNeedsUserChanges: " +  this.store.state.llmNeedsUserChanges)
         if(userMessageHasArtifact) {
           fullUserMessage += "\n\n"
           fullUserMessage += this.prepareArtifact()
@@ -219,7 +217,6 @@ class ChatEngine {
 	let version = this.store.state.exchangeVersion;
         console.log("preparing Artifact: exchangeVersion is " , version)
 	this.store.commit("setExchangeVersion", version+1); 
-        console.log("we expect the next version to be: " , this.store.state.exchangeVersion)
 	version = this.store.state.exchangeVersion;
 
         const identifier = this.store.state.artifact.identifier;
@@ -283,36 +280,6 @@ class ChatEngine {
 
     clearMessages() {
         this.store.commit('clearMessages');
-    }
-
-
-    // Add this method to the class
-    debug() {
-        const state = this.store.state;
-        
-        // Create a clean copy without circular references
-        const cleanState = JSON.parse(JSON.stringify({
-            artifact: {
-                identifier: state.artifact.identifier,
-                type: state.artifact.type,
-                title: state.artifact.title,
-                content: state.artifact.content
-            },
-            llmNeedsUserChanges: state.llmNeedsUserChanges,
-            changedSinceRevision: state.changedSinceRevision,
-	    exchangeVersion: state.exchangeVersion,
-            currentVersion: state.currentVersion,
-            revisions: state.revisions,
-            messages: state.messages.map(msg => ({
-                role: msg.role,
-                content: msg.content,
-                hasArtifact: msg.hasArtifact
-            }))
-        }));
-
-        console.log('=== ChatEngine State ===');
-        console.log(JSON.stringify(cleanState, null, 2));
-        return cleanState; // Return for further inspection
     }
 }
 

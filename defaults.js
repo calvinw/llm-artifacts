@@ -1,4 +1,4 @@
-const DEFAULT_ORDERBOT_SYSTEM_PROMPT = `You are a friendly order bot that is going to take orders from customers.
+const ORDERBOT_SYSTEM_PROMPT = `You are a friendly order bot that is going to take orders from customers.
 
 Greet the customer and introduce yourself as “The Order Technician” Be able to
 display the entire menu or just a category depending on the users requests If
@@ -59,21 +59,21 @@ Assistant: Okay, Ive updated your order details.
 | **Total** | | | **$9.25** |
 </artifact>`;
 
-const DEFAULT_ORDERBOT_ARTIFACT_CONTENT = `
+const ORDERBOT_ARTIFACT_CONTENT = `
 # Your Current Order
 
 | Item | Size | Quantity | Price |
 |------|------|----------|-------|
 `;
 
-const DEFAULT_ORDERBOT_ARTIFACT = {
+const ORDERBOT_ARTIFACT = {
     identifier: 'my-order',
     type: 'text/markdown',
     title: 'My Pizza Order',
-    content: DEFAULT_ORDERBOT_ARTIFACT_CONTENT
+    content: ORDERBOT_ARTIFACT_CONTENT
 };
 
-const DEFAULT_MARKDOWN_SYSTEM_PROMPT = `
+const MARKDOWN_SYSTEM_PROMPT = `
 You are a friendly assistant editing a document with a user.   
 
 You and the user will work on an document about their summer vacation together. The document will be markdown and the content of the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
@@ -115,7 +115,7 @@ I came back home
 </artifact>
 `;
 
-const DEFAULT_MARKDOWN_ARTIFACT_CONTENT = `
+const MARKDOWN_ARTIFACT_CONTENT = `
 # Hello World Its me.
 I am king of rock and roll!
 Five figure five figure **Hot Dog** jumping Frog
@@ -132,14 +132,14 @@ Five figure five figure **Hot Dog** jumping Frog
 
 `;
 
-const DEFAULT_MARKDOWN_ARTIFACT = {
+const MARKDOWN_ARTIFACT = {
     identifier: 'my-document',
     type: 'text/markdown',
     title: 'My Document',
-    content: DEFAULT_MARKDOWN_ARTIFACT_CONTENT
+    content: MARKDOWN_ARTIFACT_CONTENT
 };
 
-const DEFAULT_HTML_SYSTEM_PROMPT = `
+const HTML_SYSTEM_PROMPT = `
 You are a friendly assistant editing some html with the user.
 
 You and the user will work on some html together to design a bootstrap form. The document will be an html document that shows the elements of the bootstrap form and the code for the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
@@ -167,7 +167,7 @@ Example:
 </artifact>
 `;
 
-const DEFAULT_HTML_ARTIFACT_CONTENT = `
+const HTML_ARTIFACT_CONTENT = `
 <form>
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
@@ -186,14 +186,14 @@ const DEFAULT_HTML_ARTIFACT_CONTENT = `
 </form>
 `;
 
-const DEFAULT_HTML_ARTIFACT = {
+const HTML_ARTIFACT = {
     identifier: 'my-bootstrap-form',
     type: "text/html",
     title: 'My Bootstrap Form',
-    content: DEFAULT_HTML_ARTIFACT_CONTENT
+    content: HTML_ARTIFACT_CONTENT
 };
 
-const DEFAULT_SVG_SYSTEM_PROMPT = `
+const SVG_SYSTEM_PROMPT = `
 You are a friendly assistant editing an svg with the user.
 
 You and the user will work on an svg together. The document will be an svg document and the code for the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
@@ -222,7 +222,7 @@ Assistant: Sure I will remove the green rect for you.
 </artifact>
 `;
 
-const DEFAULT_SVG_ARTIFACT_CONTENT = `
+const SVG_ARTIFACT_CONTENT = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
   <rect x="10" y="10" width="30" height="80" fill="blue" />
   <rect x="50" y="30" width="30" height="60" fill="green" />
@@ -230,14 +230,14 @@ const DEFAULT_SVG_ARTIFACT_CONTENT = `
 </svg>
 `;
 
-const DEFAULT_SVG_ARTIFACT = {
+const SVG_ARTIFACT = {
     identifier: 'my-svg',
     type: "image/svg+xml",
     title: 'My SVG',
-    content: DEFAULT_SVG_ARTIFACT_CONTENT
+    content: SVG_ARTIFACT_CONTENT
 };
 
-const DEFAULT_ARTIFACT = DEFAULT_MARKDOWN_ARTIFACT; 
-const DEFAULT_ARTIFACT_CONTENT = DEFAULT_MARKDOWN_ARTIFACT_CONTENT; 
-const DEFAULT_SYSTEM_PROMPT  = DEFAULT_MARKDOWN_SYSTEM_PROMPT;
+const DEFAULT_ARTIFACT = DEFAULT_SVG_ARTIFACT; 
+const DEFAULT_ARTIFACT_CONTENT = DEFAULT_SVG_ARTIFACT_CONTENT; 
+const DEFAULT_SYSTEM_PROMPT  = DEFAULT_SVG_SYSTEM_PROMPT;
 

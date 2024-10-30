@@ -35,12 +35,12 @@ console.log("needs user changes to true")
 });
 
 // Get stored API key or use default for development
-const apiKey ="" 
+const apiKey =""	 
 const model = 'openai/gpt-4o-mini';
 
 let chatEngine = null;
 
-function initializeChatEngine(apiKey) {
+async function initializeChatEngine(apiKey) {
 
   chatEngine = new ChatEngine({
         apiKey: apiKey,
@@ -58,6 +58,33 @@ function initializeChatEngine(apiKey) {
         artifactVersion.textContent = `v${val}`;
     });
     chatEngine.subscribe("messages", updateMessagesUI);
+
+	chatEngine.subscribe("messages.0.content", function(content){
+	     console.log("got system prompt change")
+	     systemPromptTextarea.value = content;
+	})
+
+const initialMessages = [
+     "Can you see my document?",
+//      "Can you remove the red rectangle?",
+];
+
+// const initialMessages = [
+//     "Can you see my document?",
+//     "Can you remove the word Hello",
+//     "Can you give me 3 more sections",
+//     "Can you reverse the words in the entire document",
+//     "Can you put a xoxo between every word in the whole document",
+// ];
+//
+
+ for (const message of initialMessages) {
+       try {
+           const response = await chatEngine.sendMessage(message);
+       } catch (error) {
+           console.error(`Error sending message: ${message}`, error);
+       }
+   }
 }
 
 // Add this function to handle file type changes
@@ -66,17 +93,17 @@ function handleFileTypeChange(event) {
     let newSystemPrompt, newArtifact;
     
     if (fileType === 'markdown') {
-        newSystemPrompt = DEFAULT_MARKDOWN_SYSTEM_PROMPT;
-        newArtifact = DEFAULT_MARKDOWN_ARTIFACT;
+        newSystemPrompt = MARKDOWN_SYSTEM_PROMPT;
+        newArtifact = MARKDOWN_ARTIFACT;
     } else if (fileType === 'orderbot') {
-        newSystemPrompt = DEFAULT_ORDERBOT_SYSTEM_PROMPT;
-        newArtifact = DEFAULT_ORDERBOT_ARTIFACT;
+        newSystemPrompt = ORDERBOT_SYSTEM_PROMPT;
+        newArtifact = ORDERBOT_ARTIFACT;
     } else if (fileType === 'svg') {
-        newSystemPrompt = DEFAULT_SVG_SYSTEM_PROMPT;
-        newArtifact = DEFAULT_SVG_ARTIFACT;
+        newSystemPrompt = SVG_SYSTEM_PROMPT;
+        newArtifact = SVG_ARTIFACT;
     } else if (fileType === 'html') {
-        newSystemPrompt = DEFAULT_HTML_SYSTEM_PROMPT;
-        newArtifact = DEFAULT_HTML_ARTIFACT;
+        newSystemPrompt = HTML_SYSTEM_PROMPT;
+        newArtifact = HTML_ARTIFACT;
     } 
 
 	chatEngine.setSystemMessage(newSystemPrompt)
@@ -85,41 +112,12 @@ function handleFileTypeChange(event) {
 		 ...newArtifact,
 	     });
         chatEngine.setLlmNeedsUserChanges(true);
-
-    // Update system prompt
-    //systemPromptTextarea.value = newSystemPrompt;
-    //
-    //
-    // chatEngine.store.state.messages[0].content = newSystemPrompt;
-    //
-    // // Update artifact
-    // chatEngine.store.commit('setArtifact', {
-    //     ...newArtifact,
-    //     changed: false 
-    // });
-    //
-    // // Clear revisions
-    // console.log("setting revision 0");
-    // chatEngine.store.state.revisions = {};
-    // chatEngine.store.state.revisions[0] = newArtifact;
-    //
-    // // Update UI
-    // updateMessagesUI();
-    // updateArtifactUI();
-    // updateRevisionNavigationButtons();
 }
+
 
 // Add this function to handle clearing revisions
 function handleClearRevisions() {
-    // const currentArtifact = chatEngine.getArtifact();
-    // chatEngine.store.state.revisions = {};
-    // chatEngine.store.state.revisions[0] = currentArtifact;
-    // chatEngine.store.commit('setArtifact', {
-    //     ...currentArtifact,
-    //     version: 0,
-    //     changed: false
-    // });
-    updateRevisionNavigationButtons();
+	console.log("clear revisions not working yet");
 }
 
 // Add these event listeners
@@ -129,66 +127,6 @@ clearRevisionsButton.addEventListener('click', handleClearRevisions);
 modelSelect.addEventListener('change', function() {
     chatEngine.store.commit("setModel", this.value);
 });
-
-
-// Add this to your setupSubscriptions function
-// chatEngine.subscribe("artifact.version", updateRevisionNavigationButtons);
-
-// // Add this function to handle revision navigation
-// function updateRevisionNavigationButtons() {
-//     const currentVersion = chatEngine.getArtifact().version;
-//     const revisions = Object.keys(chatEngine.store.state.revisions)
-//         .map(v => parseInt(v))
-//         .sort((a, b) => a - b);
-//
-//     console.log("currentVersion: " + currentVersion)
-//     console.log("revisions")
-//     console.log(revisions)
-//     console.log(revisions.length)
-//     
-//     const currentIndex = revisions.indexOf(currentVersion);
-//     
-//     console.log("currentIndex: " + currentIndex)
-//     prevVersionBtn.disabled = currentIndex <= 0;
-//     nextVersionBtn.disabled = currentIndex === revisions.length - 1;
-// }
-//
-// Add click handlers for the navigation buttons
-// prevVersionBtn.addEventListener('click', () => {
-//     const currentVersion = chatEngine.getArtifact().version;
-//   console.log("prev button click: currentVersion: ", currentVersion)
-//     const revisions = Object.keys(chatEngine.store.state.revisions)
-//         .map(v => parseInt(v))
-//         .sort((a, b) => a - b);
-//     
-//     const currentIndex = revisions.indexOf(currentVersion);
-//     console.log("prev button currentIndex: ", currentIndex)
-//     if (currentIndex > 0) {
-//         const prevVersion = revisions[currentIndex - 1];
-//         const revision = chatEngine.store.state.revisions[prevVersion];
-//         chatEngine.store.commit('setArtifact', revision);
-//         //chatEngine.store.commit('setArtifactChanged', true);
-//         updateRevisionNavigationButtons();
-//     }
-// });
-
-// nextVersionBtn.addEventListener('click', () => {
-//     const currentVersion = chatEngine.getArtifact().version;
-//   console.log("prev button click: ", currentVersion)
-//     const revisions = Object.keys(chatEngine.store.state.revisions)
-//         .map(v => parseInt(v))
-//         .sort((a, b) => a - b);
-//     
-//     const currentIndex = revisions.indexOf(currentVersion);
-//     if (currentIndex < revisions.length - 1) {
-//         const nextVersion = revisions[currentIndex + 1];
-//         const revision = chatEngine.store.state.revisions[nextVersion];
-//         chatEngine.store.commit('setArtifact', revision);
-//         //chatEngine.store.commit('setArtifactChanged', true);
-//         updateRevisionNavigationButtons();
-//     }
-// });
-//
 
 // System prompt handler
 systemPromptTextarea.addEventListener('change', function() {
@@ -342,28 +280,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
- async function sendInitialMessages(messages) {
- for (const message of messages) {
-       try {
-           const response = await chatEngine.sendMessage(message);
-       } catch (error) {
-           console.error(`Error sending message: ${message}`, error);
-       }
-   }
- }
-
-const initialMessages = [
-     "Can you see my document?",
-//      "Can you remove the red rectangle?",
-];
-
-// const initialMessages = [
-//     "Can you see my document?",
-//     "Can you remove the word Hello",
-//     "Can you give me 3 more sections",
-//     "Can you reverse the words in the entire document",
-//     "Can you put a xoxo between every word in the whole document",
-// ];
-//
-//await sendInitialMessages(initialMessages);
 
