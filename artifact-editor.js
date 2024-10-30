@@ -29,12 +29,11 @@ displayModeRadios.forEach(radio => {
 
 clearChatButton.addEventListener('click', () => {
     chatEngine.store.commit('clearMessages');
-console.log("needs user changes to true")
     chatEngine.setLlmNeedsUserChanges(true);
 });
 
 // Get stored API key or use default for development
-const apiKey =""	 
+const apiKey ="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"	 
 const model = 'openai/gpt-4o-mini';
 
 let chatEngine = null;
@@ -59,7 +58,6 @@ async function initializeChatEngine(apiKey) {
     chatEngine.subscribe("messages", updateMessagesUI);
 
 	chatEngine.subscribe("messages.0.content", function(content){
-	     console.log("got system prompt change")
 	     systemPromptTextarea.value = content;
 	})
 
@@ -71,15 +69,6 @@ const initialMessages = [
      "Can you remove the green rectangle?",
      "Can you put in blue circle?",
 ];
-
-// const initialMessages = [
-//     "Can you see my document?",
-//     "Can you remove the word Hello",
-//     "Can you give me 3 more sections",
-//     "Can you reverse the words in the entire document",
-//     "Can you put a xoxo between every word in the whole document",
-// ];
-//
 
  for (const message of initialMessages) {
        try {
