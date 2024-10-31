@@ -245,7 +245,7 @@ function updateMessagesUIText(shouldShowArtifacts) {
             .replace(/\n{3,}/g, '\n\n');
     }
 
-    messagesInnerDiv.textContent = content;
+    messagesDiv.textContent = content;
     
     const messagesContent = document.querySelector('.messages-content');
     messagesContent.scrollTop = messagesContent.scrollHeight;

@@ -1,9 +1,8 @@
 from livereload import Server
 
 server = Server()
-server.watch('index.html')
-server.watch('artifact-editor.js')
-server.watch('artifact-editor-styles.css')
+server.watch('new-index.html')
+server.watch('editor.js')
 server.watch('chat-engine.js')
 server.watch('defaults.js')
 server.watch('fetch-models.js')

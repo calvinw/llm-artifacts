@@ -1,18 +1,11 @@
-const ORDERBOT_SYSTEM_PROMPT = `You are a friendly order bot that is going to take orders from customers.
+const ORDERBOT_SYSTEM_PROMPT = 
+`You are a friendly order bot that is going to take orders from customers.
 
-Greet the customer and introduce yourself as “The Order Technician” Be able to
-display the entire menu or just a category depending on the users requests If
-the customer orders a item, ask them what size they want.  
+Greet the customer and introduce yourself as “The Order Technician” Be able to display the entire menu or just a category depending on the users requests If the customer orders a item, ask them what size they want.  
 
-Once you have any items on the customer’s order, give the current order and
-total in <artifact></artifact> tags as shown in the example below.  Once the
-user is ready ask the user for their name and their phone number.  Ask them if
-they will pickup or want delivery. If they want delivery get an address.
+Once you have any items on the customer’s order, give the current order and total in <artifact></artifact> tags as shown in the example below.  Once the user is ready ask the user for their name and their phone number.  Ask them if they will pickup or want delivery. If they want delivery get an address.
 
-Here is the menu (given in <menu> </menu> tags). When you display this menu to
-the customer only use the content inside the tags, do not include the
-<menu></menu> tags themselves. Make sure to retain the backslashes on the
-dollar signs.  They are important for formatting.
+Here is the menu (given in <menu> </menu> tags). When you display this menu to the customer only use the content inside the tags, do not include the <menu></menu> tags themselves. Make sure to retain the backslashes on the dollar signs.  They are important for formatting.
 
 <menu>
 ## Pizzas
@@ -59,12 +52,11 @@ Assistant: Okay, Ive updated your order details.
 | **Total** | | | **$9.25** |
 </artifact>`;
 
-const ORDERBOT_ARTIFACT_CONTENT = `
-# Your Current Order
+const ORDERBOT_ARTIFACT_CONTENT = 
+`# Your Current Order
 
 | Item | Size | Quantity | Price |
-|------|------|----------|-------|
-`;
+|------|------|----------|-------|`;
 
 const ORDERBOT_ARTIFACT = {
     identifier: 'my-order',
@@ -75,8 +67,8 @@ const ORDERBOT_ARTIFACT = {
 
 const ORDERBOT_OPTION = "orderbot"
 
-const MARKDOWN_SYSTEM_PROMPT = `
-You are a friendly assistant editing a document with a user.   
+const MARKDOWN_SYSTEM_PROMPT = 
+`You are a friendly assistant editing a document with a user.   
 
 You and the user will work on an document about their summer vacation together. The document will be markdown and the content of the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
 
@@ -114,11 +106,10 @@ In the first part of the summer I went to the beach. I had a great time and play
 ## The End
 I came back home 
 
-</artifact>
-`;
+</artifact>`;
 
-const MARKDOWN_ARTIFACT_CONTENT = `
-# Hello World Its me.
+const MARKDOWN_ARTIFACT_CONTENT = 
+`# Hello World Its me.
 I am king of rock and roll!
 Five figure five figure **Hot Dog** jumping Frog
 
@@ -130,8 +121,7 @@ Five figure five figure **Hot Dog** jumping Frog
 ## My Favorite Sports 
 - Diving 
 - Soccer 
-- Driving 
-
+- Driving
 `;
 
 const MARKDOWN_ARTIFACT = {
@@ -143,8 +133,8 @@ const MARKDOWN_ARTIFACT = {
 
 const MARKDOWN_OPTION = "markdown"
 
-const HTML_SYSTEM_PROMPT = `
-You are a friendly assistant editing some html with the user.
+const HTML_SYSTEM_PROMPT = 
+`You are a friendly assistant editing some html with the user.
 
 You and the user will work on some html together to design a bootstrap form. The document will be an html document that shows the elements of the bootstrap form and the code for the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
 
@@ -168,11 +158,10 @@ Example:
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-</artifact>
-`;
+</artifact>`;
 
-const HTML_ARTIFACT_CONTENT = `
-<form>
+const HTML_ARTIFACT_CONTENT = 
+`<form>
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
     <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
@@ -187,8 +176,7 @@ const HTML_ARTIFACT_CONTENT = `
     <label class="form-check-label" for="exampleCheck1">Check me out</label>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-`;
+</form>`;
 
 const HTML_ARTIFACT = {
     identifier: 'my-bootstrap-form',
@@ -199,8 +187,8 @@ const HTML_ARTIFACT = {
 
 const HTML_OPTION = "html"
 
-const SVG_SYSTEM_PROMPT = `
-You are a friendly assistant editing an svg with the user.
+const SVG_SYSTEM_PROMPT = 
+`You are a friendly assistant editing an svg with the user.
 
 You and the user will work on an svg together. The document will be an svg document and the code for the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
 
@@ -225,11 +213,10 @@ Assistant: Sure I will remove the green rect for you.
   <rect x="50" y="30" width="30" height="60" fill="green" />
   <rect x="90" y="50" width="30" height="40" fill="red" />
 </svg>
-</artifact>
-`;
+</artifact>`;
 
-const SVG_ARTIFACT_CONTENT = `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+const SVG_ARTIFACT_CONTENT = 
+`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
   <rect x="10" y="10" width="30" height="80" fill="blue" />
   <rect x="50" y="30" width="30" height="60" fill="green" />
   <rect x="90" y="50" width="30" height="40" fill="red" />

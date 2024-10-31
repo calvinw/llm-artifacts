@@ -275,9 +275,11 @@ class ChatEngine {
         this.store.commit('setSystemMessage', value);
     }
 
+    setModel(model) {
+        this.store.commit('setModel', model);
+    }
+
     clearMessages() {
         this.store.commit('clearMessages');
     }
 }
-
-export default ChatEngine;
