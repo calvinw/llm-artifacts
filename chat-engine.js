@@ -157,11 +157,8 @@ class ChatEngine {
 	const llmsReturnedVersion = parseInt(attributes.version)
 	const exchangeVersion = this.store.state.exchangeVersion; 
 
-        console.log ("LLMs returned version: " + llmsReturnedVersion) 
-        console.log ("exchange version: " + exchangeVersion) 
 
 	if(llmsReturnedVersion == exchangeVersion+1) {
-	    console.log("got expected exchange version")
 	    this.store.commit("setExchangeVersion", exchangeVersion+1)
 	}
 
@@ -235,7 +232,6 @@ class ChatEngine {
 
     prepareArtifact() {
 	let version = this.store.state.exchangeVersion;
-        //console.log("preparing Artifact: exchangeVersion is " , version)
 	this.store.commit("setExchangeVersion", version+1); 
 	version = this.store.state.exchangeVersion;
 

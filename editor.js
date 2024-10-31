@@ -10,8 +10,6 @@ const messageInput = document.getElementById('message-input');
 const clearChatButton = document.getElementById('clear-messages');
 const displayModeRadios = document.getElementsByName('displayMode');
 
-
-
 const apiKey=""
 
 
@@ -40,7 +38,7 @@ async function initializeChatEngine(apiKey) {
 
     window.chatEngine = chatEngine;
 
-	  typeSelect.value = DEFAULT_OPTION
+    typeSelect.value = DEFAULT_OPTION
     typeSelect.addEventListener('change', handleTypeChange);
 
     chatEngine.subscribe("messages", updateMessagesUI);
@@ -65,6 +63,7 @@ async function initializeChatEngine(apiKey) {
         chatEngine.setSystemMessage(this.value.trim());
     });
 
+
     acePreviewEditor.session.on('change', debouncedUpdate);
     acePreviewEditor.on('blur', () => {
         const value = acePreviewEditor.getValue();
@@ -78,7 +77,7 @@ async function initializeChatEngine(apiKey) {
     // Add event listener for radio buttons
     displayModeRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
-            console.log("display mode changes")
+            //console.log("display mode changes")
             updateMessagesUI();
         });
     });
@@ -104,11 +103,16 @@ messageInput.addEventListener('keypress', (e) => {
 });
 
 async function sendMessage() {
-    const message = messageInput.value.trim();
+    let message = messageInput.value.trim();
     if (!message) return;
 
     messageInput.value = '';
     messageInput.focus();
+
+    const selectedText = acePreviewEditor.getSelectedText();
+    if(selectedText) {
+       message += "\n" + selectedText;
+    }
 
     try {
         await chatEngine.sendMessage(message);
@@ -200,6 +204,10 @@ function handleTypeChange(event) {
         artifact = HTML_ARTIFACT;
     } 
 
+const systemTab = document.querySelector('a[href="#system"]');
+const tab = new bootstrap.Tab(systemTab);
+tab.show();
+
 	chatEngine.setSystemMessage(system)
 	chatEngine.clearMessages();
   chatEngine.store.commit('setArtifact', {
@@ -242,7 +250,7 @@ artifactTab.addEventListener('shown.bs.tab', function (e) {
         // Double check content is in sync
         const artifact = chatEngine.getArtifact();
         if (acePreviewEditor.getValue() !== artifact.content) {
-            console.log("SETTING CONTENT...WASNT SET");
+            //console.log("SETTING CONTENT...WASNT SET");
             acePreviewEditor.setValue(artifact.content, -1);
         }
     }

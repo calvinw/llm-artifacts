@@ -1,6 +1,5 @@
 index.html
-artifact-editor.js
-artifact-editor-styles.css
+editor.js
 chat-engine.js
 defaults.js
 fetch-models.js
