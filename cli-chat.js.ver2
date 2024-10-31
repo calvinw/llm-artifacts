@@ -1,0 +1,272 @@
+import 'dotenv/config';
+import fs from 'fs';
+import readline from 'readline';
+import fetch from 'node-fetch';
+
+// Extract command line arguments with .env fallbacks
+const args = process.argv.slice(2);
+const apiKey = args[0] || process.env.npm_config_key;
+const model = args[1] || process.env.npm_config_model || 'openai/gpt-4o-mini';
+const artifactFile = args[2] || process.env.npm_config_file || './test.md';
+
+if (!apiKey) {
+    console.error('Error: API key is required. Please provide it via command line or .env file');
+    process.exit(1);
+}
+
+console.log(apiKey)
+console.log(model)
+console.log(artifactFile)
+
+// Store implementation
+class Store {
+    constructor(options) {
+        this.state = options.state || {};
+        this.mutations = options.mutations || {};
+        this.subscribers = [];
+    }
+
+    commit(mutation, payload) {
+        if (this.mutations[mutation]) {
+            const prevState = JSON.parse(JSON.stringify(this.state));
+            this.mutations[mutation](this.state, payload);
+            this.notifySubscribers(prevState);
+        } else {
+            console.error(`Mutation ${mutation} does not exist`);
+        }
+    }
+
+    subscribe(path, fn) {
+        this.subscribers.push({ path, fn });
+    }
+
+    notifySubscribers(prevState) {
+        this.subscribers.forEach(({ path, fn }) => {
+            const newValue = getNestedProperty(this.state, path);
+            const prevValue = getNestedProperty(prevState, path);
+            if (JSON.stringify(newValue) !== JSON.stringify(prevValue)) {
+                fn(newValue, prevValue);
+            }
+        });
+    }
+
+    // New method to get current state
+    getState() {
+        return this.state;
+    }
+}
+
+function getNestedProperty(obj, path) {
+    if (typeof path !== 'string') {
+        path = String(path);
+    }
+    return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+}
+
+// Initialize store
+const store = new Store({
+    state: {
+        artifact: {
+            identifier: 'cli-document',
+            type: 'text/markdown',
+            title: 'CLI Document',
+            version: 0,
+            changed: false,
+            content: ''
+        },
+        messages: [
+            { role: 'system', content: 'You are a helpful AI assistant.' }
+        ]
+    },
+    mutations: {
+        setArtifact(state, artifactData) {
+            state.artifact = { ...state.artifact, ...artifactData };
+        },
+        setArtifactContent(state, content) {
+            state.artifact.content = content;
+        },
+        setArtifactChanged(state, changed) {
+            state.artifact.changed = changed;
+        },
+        incrementArtifactVersion(state) {
+            state.artifact.version += 1;
+        },
+        addMessage(state, message) {
+            state.messages.push(message);
+        },
+        clearMessages(state) {
+            state.messages = [{ role: 'system', content: state.messages[0].content }];
+        }
+    }
+});
+
+// Helper functions for displaying state
+function displayArtifact() {
+    const artifact = store.getState().artifact;
+    console.log('\nCurrent Artifact Structure:');
+    console.log('-------------------------');
+    console.log(JSON.stringify({
+        identifier: artifact.identifier,
+        type: artifact.type,
+        title: artifact.title,
+        version: artifact.version,
+        changed: artifact.changed
+    }, null, 2));
+    console.log('\nContent Preview:');
+    //console.log(artifact.content.substring(0, 150) + '...');
+    console.log(artifact.content);
+}
+
+function displayMessages() {
+    const messages = store.getState().messages;
+    console.log('\nMessage History:');
+    console.log('---------------');
+    messages.forEach((msg, index) => {
+        //console.log(`[${index}] ${msg.role}: ${msg.content.substring(0, 100)}...`);
+        console.log(`[${index}] ${msg.role}: ${msg.content}`);
+    });
+}
+
+// CLI interface
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// Helper functions
+function extractArtifact(text) {
+    const pattern = /<artifact\s+(.*?)>([\s\S]*?)<\/artifact>/g;
+    let match = pattern.exec(text);
+
+    if (match) {
+        const attributesString = match[1];
+        const content = match[2].trim();
+        const attributes = {};
+        const attributePattern = /(\w+)="([^"]*)"/g;
+        let attrMatch;
+        while ((attrMatch = attributePattern.exec(attributesString)) !== null) {
+            const [, key, value] = attrMatch;
+            attributes[key] = value;
+        }
+        attributes.version = parseInt(attributes.version);
+        store.commit('setArtifact', {
+            ...attributes,
+            content,
+            changed: false
+        });
+        return true;
+    }
+    return false;
+}
+
+function appendArtifactToMessage(userMessage) {
+    const artifact = store.state.artifact;
+    const artifactXml = `<artifact identifier="${artifact.identifier}" type="${artifact.type}" title="${artifact.title}" version="${artifact.version}">
+${artifact.content}
+</artifact>`;
+    return `${userMessage}\n\n${artifactXml}`;
+}
+
+async function sendMessage(userMessage) {
+    try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'http://localhost',
+                'X-Title': 'CLI Chat App'
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: store.state.messages
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+        extractArtifact(aiMessage);
+        store.commit('addMessage', { role: 'assistant', content: aiMessage });
+        console.log('\nAI:', aiMessage, '\n');
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+}
+
+// Process special commands
+function processCommand(input) {
+    switch (input.toLowerCase()) {
+        case '/artifact':
+            displayArtifact();
+            return true;
+        case '/messages':
+            displayMessages();
+            return true;
+        case '/help':
+            console.log('\nAvailable Commands:');
+            console.log('/artifact - Display current artifact structure');
+            console.log('/messages - Display message history');
+            console.log('/help - Show this help message');
+            console.log('exit - Exit the chat');
+            return true;
+        default:
+            return false;
+    }
+}
+
+// Main chat loop
+async function startChat() {
+    try {
+        // Load initial artifact
+        const initialContent = fs.readFileSync(artifactFile, 'utf8');
+        store.commit('setArtifactContent', initialContent);
+        console.log('Initial artifact loaded. Starting chat...');
+        console.log('Type /help to see available commands\n');
+
+        const askQuestion = () => {
+            rl.question('You: ', async (userInput) => {
+                if (userInput.toLowerCase() === 'exit') {
+                    rl.close();
+                    return;
+                }
+
+                // Check for special commands
+                if (processCommand(userInput)) {
+                    askQuestion();
+                    return;
+                }
+
+                // Prepare and send message
+                let finalMessage = userInput;
+                if (store.state.artifact.changed || store.state.messages.length === 1) {
+                    store.commit('incrementArtifactVersion');
+                    store.commit('setArtifactChanged', false);
+                    finalMessage = appendArtifactToMessage(userInput);
+                }
+
+                store.commit('addMessage', { role: 'user', content: finalMessage });
+                await sendMessage(finalMessage);
+                askQuestion();
+            });
+        };
+
+        askQuestion();
+    } catch (error) {
+        console.error('Error starting chat:', error);
+        process.exit(1);
+    }
+}
+
+// Subscribe to artifact changes
+store.subscribe('artifact.content', (newValue) => {
+    store.commit('setArtifactChanged', true);
+    // Optionally save to file after each change
+    fs.writeFileSync(artifactFile, newValue, 'utf8');
+});
+
+// Start the chat
+startChat();

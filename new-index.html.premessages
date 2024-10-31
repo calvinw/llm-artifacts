@@ -18,15 +18,10 @@
             height: 100vh;
         }
 
-        #sidebar.collapsed {
-            margin-left: -350px;
-            left: 0;
-        }
-
         /* Sidebar styles */
         #sidebar {
             min-width: 250px;
-            max-width: 350px;
+            max-width: 250px;
             height: 100vh;
             background: #f8f9fa;
             transition: all 0.3s ease-in-out;
@@ -34,17 +29,11 @@
             position: fixed;
             z-index: 1000;
             left: 0;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Add styles for the sidebar content container */
-        #sidebar .p-3 {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-        /* Add padding to bottom to ensure last items are visible when scrolled */
-            padding-bottom: 2rem !important;
+        #sidebar.collapsed {
+            margin-left: -250px;
+            left: 0;
         }
 
         /* System prompt styles */
@@ -117,82 +106,6 @@
             padding: 1rem;
         }
 
-/* Base tab-pane styles - applies to both messages and system */
-.tab-content {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-}
-
-.tab-pane {
-    width: 100%;
-    display: none;
-}
-
-.tab-pane.active.show {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Messages specific styles */
-
-.user-message {
-    background-color: #f8f9fa;
-    border-left: 3px solid #007bff;
-}
-
-.assistant-message {
-    background-color: #fff;
-    border-left: 3px solid #28a745;
-}
-
-.chat-message {
-    padding: 8px 12px;
-    margin: 4px 0;
-    line-height: 1.4;
-    border-radius: 4px;
-}
-
-#messages-inside {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-#messages {
-    height: 100%;
-}
-
-.messages-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-}
-
-.input-container {
-    padding: 1rem;
-    background: #fff;
-    border-top: 1px solid #dee2e6;
-}
-
-/* System tab specific styles */
-#system {
-    height: 100%;
-}
-
-#system-prompt {
-    height: 100%;
-    width: 100%;
-}
-
-/* Message input styles */
-#message-input {
-    resize: none;
-    height: 38px;
-    overflow-y: auto;
-    max-height: 150px;
-}
-
-
         /* Panel styles */
         .messages-panel, .artifact-panel {
             display: flex;
@@ -207,15 +120,6 @@
             padding: 1rem;
             border-bottom: 1px solid #dee2e6;
             background: #f8f9fa;
-        } 
-
-        .messages-header .d-flex {
-            gap: 8px;  /* Space between elements */
-        }
-
-        #current-model {
-            white-space: nowrap;  /* Prevent badge text from wrapping */
-            margin-right: 4px;    /* Small gap before buttons */
         }
 
         /* Resizer styles */
@@ -271,17 +175,16 @@
                 flex: none;
                 height: 50vh;
             }
-     #sidebar {
-        left: -350px; /* Change from -250px to -350px to match the max-width */
-        margin-left: 0;
-        transition: left 0.3s ease-in-out;
-    }
 
-    #sidebar.active {
-        left: 0;
-        margin-left: 0;
-    }
+            #sidebar {
+                left: -250px;
+                margin-left: 0;
+            }
 
+            #sidebar.active {
+                left: 0;
+                margin-left: 0;
+            }
 
             .main-content {
                 margin-left: 0;
@@ -358,28 +261,16 @@
                 <!-- Messages Section -->
                 <div class="chat-column" id="chat-panel">
                     <div class="messages-panel">
-                      <div class="messages-header">
-                          <div class="d-flex justify-content-between align-items-center">
-                              <h5 class="mb-0">Messages Panel</h5>
-                              <div class="d-flex align-items-center gap-2">
-                                  <span id="current-model" class="badge bg-secondary"></span>
-                                  <div class="btn-group">
-                                      <button class="btn btn-sm btn-outline-secondary" id="clear-messages">Clear Messages</button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <!--
                         <div class="messages-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Messages Panel</h5>
                                 <span id="current-model" class="badge bg-secondary"> </span>
                                 <div class="btn-group">
-                                    <button id="clear-messages" class="btn btn-sm btn-outline-secondary">Clear Messages </button>
+                                    <button class="btn btn-sm btn-outline-secondary">Action 1</button>
+                                    <button class="btn btn-sm btn-outline-secondary">Action 2</button>
                                 </div>
                             </div>
                         </div>
-                        -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#messages">Messages</a>
@@ -389,19 +280,11 @@
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane fade" id="messages">
-                              <div class="messages-content">
-                                  <div id="messages-inside"></div>
-                              </div>
-                              <div class="input-container">
-                                  <div class="input-group">
-                                      <textarea class="form-control" id="message-input" placeholder="Type your message..."></textarea>
-                                      <button class="btn btn-primary align-self-stretch" id="send-button">Send</button>
-                                  </div>
-                              </div>
+                            <div class="tab-pane fade" id=messages">
                             </div>
                             <div class="tab-pane fade show active" id="system">
-                                <textarea class="form-control h-100" id="system-prompt"></textarea>
+                                <!-- <textarea class="form-control h-100" id="system-prompt"></textarea> -->
+                                hello
                             </div>
                         </div>
                     </div>
@@ -423,15 +306,15 @@
                                     <option value="html">HTML</option>
                                     <option value="orderbot">Order Bot</option>
                                 </select>
-                                <!-- <div class="btn-group"> -->
-                                <!--     <button class="btn btn-sm btn-outline-secondary">Action 3</button> -->
-                                <!--     <button class="btn btn-sm btn-outline-secondary">Action 4</button> -->
-                                <!-- </div> -->
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-secondary">Action 3</button>
+                                    <button class="btn btn-sm btn-outline-secondary">Action 4</button>
+                                </div>
                             </div>
                         </div>
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a id="artifact-tab" class="nav-link active" data-bs-toggle="tab" href="#artifact">Artifact</a>
+                                <a class="nav-link active" data-bs-toggle="tab" href="#artifact">Artifact</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="tab" href="#preview">Preview</a>
@@ -455,7 +338,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <script src="defaults.js"></script>
-    <script src="fetch-models.js"></script>
     <script src="chat-engine.js"></script>
     <script src="editor.js"></script>
     

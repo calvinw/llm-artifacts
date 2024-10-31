@@ -1,0 +1,54 @@
+Artifact attributes changed:
+Old attributes: { type: '', identifier: '', title: '', version: 0 }
+New attributes: {
+  type: 'text/markdown',
+  identifier: 'my-summer-vacation',
+  title: 'My Summer Vacation',
+  version: '1'
+}
+Current State: {
+  artifact: {
+    content: '# My Summer Vacation',
+    attributes: {
+      type: 'text/markdown',
+      identifier: 'my-summer-vacation',
+      title: 'My Summer Vacation',
+      version: '1'
+    }
+  },
+  messages: [
+    { role: 'user', content: 'Hello how are you?' },
+    { role: 'assistant', content: 'Im here to help' },
+    { role: 'user', content: 'Hello there' }
+  ]
+}
+Artifact attributes changed:
+Old attributes: {
+  type: 'text/markdown',
+  identifier: 'my-summer-vacation',
+  title: 'My Summer Vacation',
+  version: '1'
+}
+New attributes: {
+  type: 'text/markdown',
+  identifier: 'my-summer-vacation',
+  title: 'My Summer Vacation',
+  version: '2'
+}
+Current State: {
+  artifact: {
+    content: '# My Big Summer Vacation',
+    attributes: {
+      type: 'text/markdown',
+      identifier: 'my-summer-vacation',
+      title: 'My Summer Vacation',
+      version: '2'
+    }
+  },
+  messages: [
+    { role: 'user', content: 'Hello how are you?' },
+    { role: 'assistant', content: 'Im here to help' },
+    { role: 'user', content: 'Hello there' },
+    { role: 'assistant', content: 'Nice to see you\n\nHows it going?' }
+  ]
+}

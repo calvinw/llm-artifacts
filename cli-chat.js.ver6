@@ -1,0 +1,131 @@
+import 'dotenv/config';
+import readline from 'readline';
+import ChatEngine from './chat-engine.js';
+
+// Extract command line arguments with .env fallbacks
+const args = process.argv.slice(2);
+const apiKey = args[0] || process.env.npm_config_key;
+const model = args[1] || process.env.npm_config_model || 'openai/gpt-4o-mini';
+const artifactFile = args[2] || process.env.npm_config_file || './test.md';
+const systemPromptFile = args[3] || process.env.npm_config_system || './system.txt';
+const messagesFile = args[4] || process.env.npm_config_messages || './messages.md';
+
+if (!apiKey) {
+    console.error('Error: API key is required. Please provide it via command line or .env file');
+    process.exit(1);
+}
+
+// Initialize chat engine
+const chatEngine = new ChatEngine({
+    apiKey,
+    model,
+    artifactFile,
+    systemPromptFile,
+    messagesFile
+});
+
+// Helper functions for displaying state
+function displayArtifact() {
+    const artifact = chatEngine.getArtifact();
+    console.log('\nCurrent Artifact Structure:');
+    console.log('-------------------------');
+    console.log(JSON.stringify({
+        identifier: artifact.identifier,
+        type: artifact.type,
+        title: artifact.title,
+        version: artifact.version,
+        changed: artifact.changed
+    }, null, 2));
+    console.log('\nContent:');
+    console.log(artifact.content);
+}
+
+
+
+function displayMessages() {
+    const messages = chatEngine.getMessages();
+    console.log('\nMessage History:');
+    console.log('---------------');
+    messages.forEach((msg, index) => {
+        console.log(`[${index}] ${msg.role.toUpperCase()}: ${msg.content}`);
+    });
+}
+
+function displaySystemPrompt() {
+    const systemPrompt = chatEngine.getSystemPrompt();
+    console.log('\nCurrent System Prompt:');
+    console.log('---------------------');
+    console.log(systemPrompt);
+}
+
+// Process special commands
+function processCommand(input) {
+    switch (input.toLowerCase()) {
+        case '/artifact':
+            displayArtifact();
+            return true;
+        case '/messages':
+            displayMessages();
+            return true;
+        case '/system':
+            displaySystemPrompt();
+            return true;
+        case '/help':
+            console.log('\nAvailable Commands:');
+            console.log('/artifact - Display current artifact structure');
+            console.log('/messages - Display message history');
+            console.log('/system  - Display current system prompt');
+            console.log('/help    - Show this help message');
+            console.log('exit     - Exit the chat');
+            return true;
+        default:
+            return false;
+    }
+}
+
+// CLI interface
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// Main chat loop
+async function startChat() {
+    try {
+        // Load initial artifact
+        chatEngine.loadInitialArtifact();
+        console.log('Initial artifact loaded. Starting chat...');
+        console.log('Type /help to see available commands\n');
+
+        const askQuestion = () => {
+            rl.question('You: ', async (userInput) => {
+                if (userInput.toLowerCase() === 'exit') {
+                    rl.close();
+                    return;
+                }
+
+                // Check for special commands
+                if (processCommand(userInput)) {
+                    askQuestion();
+                    return;
+                }
+
+                try {
+                    const aiMessage = await chatEngine.sendMessage(userInput);
+                    console.log('\nAI:', aiMessage, '\n');
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+                askQuestion();
+            });
+        };
+
+        askQuestion();
+    } catch (error) {
+        console.error('Error starting chat:', error);
+        process.exit(1);
+    }
+}
+
+// Start the chat
+startChat();
