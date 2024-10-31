@@ -87,7 +87,13 @@ async function initializeChatEngine(apiKey) {
         chatEngine.setLlmNeedsUserChanges(true);
     });
 
+    const modelSelect = document.getElementById('model');
+    modelSelect.addEventListener('change', function() {
+      chatEngine.store.commit("setModel", this.value);
+    });
+
 }
+
 
 // Event listeners
 sendButton.addEventListener('click', (e) => {
