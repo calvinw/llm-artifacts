@@ -1,0 +1,289 @@
+body {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.wrapper {
+  display: flex;
+  height: 100vh;
+}
+
+#sidebar.collapsed {
+  margin-left: -350px;
+  left: 0;
+}
+
+/* Sidebar styles */
+#sidebar {
+  min-width: 250px;
+  max-width: 350px;
+  height: 100vh;
+  background: #f8f9fa;
+  transition: all 0.3s ease-in-out;
+  border-right: 1px solid #dee2e6;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add styles for the sidebar content container */
+#sidebar .p-3 {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+/* Add padding to bottom to ensure last items are visible when scrolled */
+  padding-bottom: 2rem !important;
+  padding-top: 4rem !important;
+}
+
+/* System prompt styles */
+#system-prompt {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  padding: 1rem;
+  font-family: monospace;
+}
+
+/* Tab pane full height */
+.tab-content {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-pane {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Overlay for mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Main content styles */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  margin-left: 250px;
+  transition: all 0.3s ease-in-out;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 0;
+}
+
+.chat-columns {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.chat-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 1rem;
+}
+
+/* Base tab-pane styles - applies to both messages and system */
+.tab-content {
+flex: 1;
+display: flex;
+/* overflow: hidden; */
+}
+
+.tab-pane {
+width: 100%;
+display: none;
+}
+
+.tab-pane.active.show {
+display: flex;
+flex-direction: column;
+}
+
+/* Messages specific styles */
+
+.user-message {
+background-color: #f8f9fa;
+border-left: 3px solid #007bff;
+}
+
+.assistant-message {
+background-color: #fff;
+border-left: 3px solid #28a745;
+}
+
+.chat-message {
+padding: 8px 12px;
+margin: 4px 0;
+line-height: 1.4;
+border-radius: 4px;
+}
+
+#messages-inside {
+white-space: pre-wrap;
+word-wrap: break-word;
+}
+
+#messages {
+height: 100%;
+}
+
+.messages-content {
+flex: 1;
+overflow-y: auto;
+padding: 1rem;
+}
+
+.input-container {
+padding: 1rem;
+background: #fff;
+border-top: 1px solid #dee2e6;
+}
+
+/* System tab specific styles */
+#system {
+height: 100%;
+}
+
+#system-prompt {
+height: 100%;
+width: 100%;
+}
+
+/* Message input styles */
+#message-input {
+resize: none;
+height: 38px;
+overflow-y: auto;
+max-height: 150px;
+}
+
+/* Panel styles */
+.messages-panel, .artifact-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.messages-header, .artifact-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background: #f8f9fa;
+} 
+
+.messages-header .d-flex {
+  gap: 8px;  /* Space between elements */
+}
+
+#current-model {
+  white-space: nowrap;  /* Prevent badge text from wrapping */
+  margin-right: 4px;    /* Small gap before buttons */
+}
+
+/* Resizer styles */
+.divider {
+  width: 8px;
+  background: #f8f9fa;
+  cursor: col-resize;
+  transition: background 0.3s;
+}
+
+.divider:hover, .resizing .divider {
+  background: #0d6efd;
+}
+
+.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* Ensure tabs are same height */
+.nav-tabs {
+  background: #f8f9fa;
+  padding-top: 0.5rem;
+}
+
+/* Sidebar toggle button styles */
+#sidebarCollapse {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 1001;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .chat-columns {
+      flex-direction: column;
+  }
+
+  .divider {
+      display: none;
+  }
+
+  .chat-column {
+      padding: 0.5rem;
+      flex: none;
+      height: 50vh;
+  }
+
+#sidebar {
+left: -350px; /* Change from -250px to -350px to match the max-width */
+margin-left: 0;
+transition: left 0.3s ease-in-out;
+}
+
+#sidebar.active {
+left: 0;
+margin-left: 0;
+}
+
+
+  .main-content {
+      margin-left: 0;
+      padding-top: 60px;
+  }
+
+  .messages-panel, .artifact-panel {
+      height: 100%;
+  }
+
+  body.sidebar-open {
+      overflow: hidden;
+  }
+}

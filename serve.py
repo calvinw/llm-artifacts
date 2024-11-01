@@ -1,7 +1,7 @@
 from livereload import Server
 
 server = Server()
-server.watch('new-index.html')
+server.watch('index.html')
 server.watch('editor.js')
 server.watch('chat-engine.js')
 server.watch('defaults.js')

@@ -172,8 +172,16 @@ function updateMessagesUIMarkdown() {
         .join('');
 
     messagesInsideDiv.innerHTML = messagesHTML;
+    renderMath(messagesInsideDiv)
 
 }
+
+  function renderMath(element) {
+      if (window.MathJax) {
+          window.MathJax.typesetPromise([element])
+              .catch((err) => console.error('MathJax typesetting failed:', err));
+      }
+  }
 
 
 function updateMessagesUI() {
@@ -237,6 +245,7 @@ function renderPreview() {
         html = content;
     }
     previewContent.innerHTML = html;
+    renderMath(previewContent)
 }
 
 function updateArtifactUI() {

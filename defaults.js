@@ -67,8 +67,7 @@ const ORDERBOT_ARTIFACT = {
 
 const ORDERBOT_OPTION = "orderbot"
 
-const MARKDOWN_SYSTEM_PROMPT = 
-`You are a friendly assistant editing a document with a user.   
+const MARKDOWN_SYSTEM_PROMPT =`You are a friendly assistant editing a document with a user.   
 
 You and the user will work on an document about their summer vacation together. The document will be markdown and the content of the document will always be placed inside of <artifact></artifact> tags. Sometimes you will make changes to the document and send them to the user, and sometimes the user will make changes to the document and send them to you.
 
@@ -108,21 +107,41 @@ I came back home
 
 </artifact>`;
 
-const MARKDOWN_ARTIFACT_CONTENT = 
-`# Hello World Its me.
-I am king of rock and roll!
-Five figure five figure **Hot Dog** jumping Frog
+const MARKDOWN_ARTIFACT_CONTENT =`# Markdown Showcase Document
+> A brief guide to markdown formatting
 
-## My Favorite TV Shows
-- The Brady Bunch
-- My Favorite Martian
-- Bewitched
+## Text Formatting
 
-## My Favorite Sports 
-- Diving 
-- Soccer 
-- Driving
-`;
+This is a paragraph with *italic text* and **bold text**. You can also use _underscores_ for emphasis. Strike through text using ~~two tildes~~.
+
+---
+
+## Lists
+
+### Unordered Lists
+* Item 1
+* Item 2
+  * Nested item 2.1
+* Item 3
+
+### Ordered Lists
+1. First item
+2. Second item
+3. Third item
+
+## Tables
+
+### Simple Table
+| Header 1 | Header 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+| Cell 3   | Cell 4   |
+
+---
+
+*End of document*
+
+> "Markdown is not just about formatting text, it's about writing with clarity and structure."`;
 
 const MARKDOWN_ARTIFACT = {
     identifier: 'my-document',
@@ -232,8 +251,8 @@ const SVG_ARTIFACT = {
 
 const SVG_OPTION = "svg"
 
-const DEFAULT_ARTIFACT = SVG_ARTIFACT; 
-const DEFAULT_ARTIFACT_CONTENT = SVG_ARTIFACT_CONTENT; 
-const DEFAULT_SYSTEM_PROMPT  = SVG_SYSTEM_PROMPT;
-const DEFAULT_OPTION  = SVG_OPTION;
+const DEFAULT_ARTIFACT = MARKDOWN_ARTIFACT; 
+const DEFAULT_ARTIFACT_CONTENT = MARKDOWN_ARTIFACT_CONTENT; 
+const DEFAULT_SYSTEM_PROMPT  = MARKDOWN_SYSTEM_PROMPT;
+const DEFAULT_OPTION  = MARKDOWN_OPTION;
 
