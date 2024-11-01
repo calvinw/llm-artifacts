@@ -94,6 +94,13 @@ async function initializeChatEngine(apiKey) {
 
 }
 
+function preprocessMarkdownForMath(markdown) {
+return markdown.replace(/\\\(/g, '\\\\(')
+		 .replace(/\\\)/g, '\\\\)')
+		 .replace(/\\\[/g, '\\\\[')
+		 .replace(/\\\]/g, '\\\\]')
+		 .replace(/\\\$/g, '\\\\$');
+}
 
 // Event listeners
 sendButton.addEventListener('click', (e) => {
@@ -163,7 +170,8 @@ function updateMessagesUIMarkdown() {
 
             // Remove artifact tags and their content always
             const cleanContent = msg.content.replace(/<artifact[\s\S]*?<\/artifact>/g, '').trim();
-            const contentHtml = marked.parse(cleanContent, markedOptions)
+            const processedMarkdown = preprocessMarkdownForMath(cleanContent)
+            const contentHtml = marked.parse(processedMarkdown, markedOptions)
                 .replace(/^<p>|<\/p>$/g, '')
                 .replace(/<p>/g, '<br>')
                 .replace(/<\/p>/g, '');
@@ -238,7 +246,8 @@ function renderPreview() {
 
     if (type === 'text/markdown') {
         const markedOptions = { breaks: true, gfm: true };
-        html = marked.parse(content, markedOptions);
+        const processedMarkdown = preprocessMarkdownForMath(content)
+        html = marked.parse(processedMarkdown, markedOptions);
     } else if (type === 'text/html') {
         html = content;
     } else if (type === 'image/svg+xml') {
