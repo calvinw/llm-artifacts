@@ -46,27 +46,6 @@
                 <!-- Error messages will be displayed here -->
             </div>
             <div class="mb-3">
-                <label class="form-label">Render Messages As:</label>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="displayMode" id="displayText" value="text">
-                    <label class="form-check-label" for="displayText">
-                        Text
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="displayMode" id="displayTextArtifacts" value="textArtifacts">
-                    <label class="form-check-label" for="displayTextArtifacts">
-                        Text with Artifacts
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="displayMode" id="displayMarkdown" value="markdown" checked>
-                    <label class="form-check-label" for="displayMarkdown">
-                        Markdown (Artifacts Hidden)
-                    </label>
-                </div>
-            </div>
-            <div class="mb-3">
                 <label class="form-label">Model</label>
                 <select class="form-select" id="model">
                     <option value="">Select a model</option>
@@ -89,6 +68,12 @@
                               <h5 class="mb-0 me-auto ms-5">Messages</h5> 
                               <div class="d-flex align-items-center gap-2">
                                   <span id="current-model" class="badge bg-secondary"></span>
+                                  <span class="text-muted">Messages Style:</span>
+                                  <select class="form-select form-select-sm" id="displayMode" style="width: auto;">
+                                      <option value="markdown">Markdown</option>
+                                      <option value="text">Plain Text</option>
+                                      <option value="textArtifacts">Text with Artifacts</option>
+                                  </select>
                                   <div class="btn-group">
                                       <button class="btn btn-sm btn-outline-secondary" id="clear-messages">Clear Messages</button>
                                   </div>
@@ -133,10 +118,11 @@
                                 <h5 class="mb-0">Artifact</h5>
                                 <span class="fw-bold ms-3 me-3" id="artifact-title"></span>
                                 <select class="form-select form-select-sm ms-2" id="type-select" style="width: auto;">
-                                    <option value="markdown">Markdown</option>
-                                    <option value="svg">SVG</option>
-                                    <option value="html">HTML</option>
-                                    <option value="orderbot">Order Bot</option>
+                                    <option value="markdown">Markdown Document</option>
+                                    <option value="svg">SVG document</option>
+                                    <option value="html">HTML document</option>
+                                    <option value="orderbot">Pizza OrderBot</option>
+                                    <option value="percentincrease">Percent Increase Tutor</option>
                                 </select>
                             </div>
                         </div>

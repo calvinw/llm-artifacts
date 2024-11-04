@@ -74,13 +74,11 @@ async function initializeChatEngine(apiKey) {
         }
     });
 
-    // Add event listener for radio buttons
-    displayModeRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            //console.log("display mode changes")
-            updateMessagesUI();
-        });
-    });
+
+const displayModeSelect = document.getElementById('displayMode');
+displayModeSelect.addEventListener('change', (e) => {
+    updateMessagesUI();
+});
 
     clearChatButton.addEventListener('click', () => {
         chatEngine.store.commit('clearMessages');
@@ -91,6 +89,17 @@ async function initializeChatEngine(apiKey) {
     modelSelect.addEventListener('change', function() {
       chatEngine.store.commit("setModel", this.value);
     });
+
+      // Start with sidebar collapsed if API key is present
+    if (apiKey) {
+      console.log("hello apiKey there")
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+        if (window.innerWidth > 768) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('sidebar-collapsed');
+        }
+    }
 
 }
 
@@ -137,9 +146,16 @@ async function sendMessage() {
 }
 
 const messagesInsideDiv = document.getElementById('messages-inside');
+
 function updateMessagesUIText(showArtifacts) {
-    const dashes = "=".repeat(60);
+    //const dashes = "=".repeat(60);
     const messages = chatEngine.getMessages();
+
+      // Calculate number of dashes based on container width
+    const containerWidth = messagesInsideDiv.offsetWidth;
+    // Assuming monospace font where each dash is ~8px wide
+    const numDashes = Math.floor(containerWidth / 10);
+    const dashes = "=".repeat(numDashes);
     
     let content = messages
         .filter(msg => msg.role !== 'system')
@@ -158,6 +174,7 @@ function updateMessagesUIText(showArtifacts) {
 
     messagesInsideDiv.textContent = content;
 }
+
 
 function updateMessagesUIMarkdown() {
     const messages = chatEngine.getMessages();
@@ -193,8 +210,7 @@ function updateMessagesUIMarkdown() {
 
 
 function updateMessagesUI() {
-    const displayMode = 
-    document.querySelector('input[name="displayMode"]:checked').value;
+    const displayMode = document.getElementById('displayMode').value;
     
     if (displayMode === 'markdown') {
         updateMessagesUIMarkdown();
@@ -224,7 +240,10 @@ function handleTypeChange(event) {
     } else if (type === 'html') {
         system = HTML_SYSTEM_PROMPT;
         artifact = HTML_ARTIFACT;
-    } 
+    } else if (type === 'percentincrease') {
+        system = PERCENT_INCREASE_SYSTEM_PROMPT;
+        artifact = PERCENT_INCREASE_ARTIFACT;
+    }
 
 const systemTab = document.querySelector('a[href="#system"]');
 const tab = new bootstrap.Tab(systemTab);

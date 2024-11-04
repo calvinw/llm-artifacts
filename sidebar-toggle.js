@@ -27,6 +27,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Close sidebar when clicking on main content area
+    mainContent.addEventListener('click', function(e) {
+        // Only proceed if sidebar is open
+        const isSidebarOpen = window.innerWidth <= 768 ? 
+            sidebar.classList.contains('active') : 
+            !sidebar.classList.contains('collapsed');
+            
+        if (isSidebarOpen) {
+            // Don't close if clicking on the toggle button or within the sidebar
+            if (!e.target.closest('#sidebarCollapse') && !e.target.closest('#sidebar')) {
+                toggleSidebar();
+            }
+        }
+    });
+
     // Handle window resize
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
